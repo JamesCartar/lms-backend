@@ -7,27 +7,56 @@ import { ValidatedQuery } from '../types/request.types';
  * Convert Zod error messages to user-friendly messages
  */
 const makeErrorMessageUserFriendly = (message: string, path: string): string => {
+  // Handle "Invalid input: expected <type>, received <actual>" pattern
+  const invalidInputMatch = message.match(/Invalid input: expected ([^,]+), received (.+)/i);
+  if (invalidInputMatch) {
+    const expectedType = invalidInputMatch[1];
+    const receivedType = invalidInputMatch[2];
+    
+    // Handle missing/undefined/null values
+    if (receivedType === 'undefined' || receivedType === 'null') {
+      if (expectedType === 'string') {
+        return `${path} is required and must be text`;
+      } else if (expectedType === 'number') {
+        return `${path} is required and must be a number`;
+      } else if (expectedType === 'boolean') {
+        return `${path} is required and must be true or false`;
+      } else {
+        return `${path} is required`;
+      }
+    }
+    
+    // Handle type mismatches
+    if (expectedType === 'string') {
+      return `${path} must be text`;
+    } else if (expectedType === 'number') {
+      return `${path} must be a number`;
+    } else if (expectedType === 'boolean') {
+      return `${path} must be true or false`;
+    } else {
+      return `${path} must be a valid ${expectedType}`;
+    }
+  }
+  
+  // Handle "Required" errors
+  if (message === 'Required') {
+    return `${path} is required`;
+  }
+  
   // Common patterns and their friendly messages
   if (message.includes('Invalid email')) {
     return 'Please enter a valid email address';
   }
-  if (message.includes('Expected string')) {
-    return `${path} must be a text value`;
-  }
-  if (message.includes('Expected number')) {
-    return `${path} must be a number`;
-  }
-  if (message.includes('Expected boolean')) {
-    return `${path} must be true or false`;
-  }
-  if (message.includes('too_small') || message.includes('String must contain at least')) {
-    const match = message.match(/at least (\d+)/);
+  if (message.includes('Too small') || message.includes('too_small') || message.includes('String must contain at least')) {
+    // Handle "Too small: expected string to have >=N characters" format
+    const match = message.match(/>=\s*(\d+)\s*characters?/) || message.match(/at least (\d+)/);
     if (match) {
       return `${path} must be at least ${match[1]} characters long`;
     }
   }
-  if (message.includes('too_big') || message.includes('String must contain at most')) {
-    const match = message.match(/at most (\d+)/);
+  if (message.includes('Too big') || message.includes('too_big') || message.includes('String must contain at most')) {
+    // Handle "Too big: expected string to have <=N characters" format
+    const match = message.match(/<=\s*(\d+)\s*characters?/) || message.match(/at most (\d+)/);
     if (match) {
       return `${path} must be at most ${match[1]} characters long`;
     }
@@ -40,9 +69,6 @@ const makeErrorMessageUserFriendly = (message: string, path: string): string => 
     if (match) {
       return `${path} must be one of: ${match[1]}`;
     }
-  }
-  if (message.includes('Invalid input') && path.includes('ObjectId')) {
-    return `${path} must be a valid ID`;
   }
 
   // Return the original message if no friendly replacement found
