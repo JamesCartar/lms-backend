@@ -2,6 +2,7 @@ import { AdminRepository } from '../repositories/admin.repository';
 import { RoleRepository } from '../repositories/role.repository';
 import { AdminCreateInput, AdminUpdateInput } from '../models/admin.model';
 import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
+import { calculateSkip } from '../utils/pagination.util';
 
 /**
  * Admin Service - Business logic layer for Admin
@@ -59,7 +60,8 @@ export class AdminService {
     sortBy?: string,
     sortOrder?: 'asc' | 'desc'
   ) {
-    const admins = await this.repository.findAll(page, limit, sortBy, sortOrder);
+    const skip = calculateSkip(page, limit);
+    const admins = await this.repository.findAll(skip, limit, sortBy, sortOrder);
     const total = await this.repository.count();
     return { admins, total };
   }

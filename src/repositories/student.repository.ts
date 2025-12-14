@@ -18,12 +18,11 @@ export class StudentRepository {
   }
 
   async findAll(
-    page: number = 1,
-    limit: number = 10,
+    skip: number,
+    limit: number,
     sortBy: string = 'createdAt',
     sortOrder: 'asc' | 'desc' = 'desc'
   ): Promise<DocumentType<Student>[]> {
-    const skip = (page - 1) * limit;
     const sortObj: Record<string, 1 | -1> = {
       [sortBy]: sortOrder === 'asc' ? 1 : -1,
     };

@@ -2,6 +2,7 @@ import { UserLogRepository } from '../repositories/userlog.repository';
 import { NotFoundError } from '../utils/errors.util';
 import { UserLog } from '../models/userlog.model';
 import { Types } from 'mongoose';
+import { calculateSkip } from '../utils/pagination.util';
 
 /**
  * UserLog Service - Business logic layer for UserLog
@@ -44,14 +45,14 @@ export class UserLogService {
     sortBy?: string,
     sortOrder?: 'asc' | 'desc'
   ) {
-    const skip = (page - 1) * limit;
+    const skip = calculateSkip(page, limit);
     const logs = await this.repository.findAll(skip, limit, sortBy, sortOrder);
     const total = await this.repository.count();
     return { logs, total };
   }
 
   async getUserLogsByUserId(userId: string, page: number, limit: number) {
-    const skip = (page - 1) * limit;
+    const skip = calculateSkip(page, limit);
     const logs = await this.repository.findByUserId(userId, skip, limit);
     const total = await this.repository.countByUserId(userId);
     return { logs, total };

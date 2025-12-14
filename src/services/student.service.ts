@@ -1,6 +1,7 @@
 import { StudentRepository } from '../repositories/student.repository';
 import { StudentCreateInput, StudentUpdateInput } from '../models/student.model';
 import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
+import { calculateSkip } from '../utils/pagination.util';
 
 /**
  * Student Service - Business logic layer for Student
@@ -41,7 +42,8 @@ export class StudentService {
     sortBy?: string,
     sortOrder?: 'asc' | 'desc'
   ) {
-    const students = await this.repository.findAll(page, limit, sortBy, sortOrder);
+    const skip = calculateSkip(page, limit);
+    const students = await this.repository.findAll(skip, limit, sortBy, sortOrder);
     const total = await this.repository.count();
     return { students, total };
   }

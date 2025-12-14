@@ -2,6 +2,7 @@ import { RoleRepository } from '../repositories/role.repository';
 import { PermissionRepository } from '../repositories/permission.repository';
 import { RoleCreateInput, RoleUpdateInput } from '../models/role.model';
 import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
+import { calculateSkip } from '../utils/pagination.util';
 
 /**
  * Role Service - Business logic layer for Role
@@ -56,7 +57,8 @@ export class RoleService {
     sortBy?: string,
     sortOrder?: 'asc' | 'desc'
   ) {
-    const roles = await this.repository.findAll(page, limit, sortBy, sortOrder);
+    const skip = calculateSkip(page, limit);
+    const roles = await this.repository.findAll(skip, limit, sortBy, sortOrder);
     const total = await this.repository.count();
     return { roles, total };
   }

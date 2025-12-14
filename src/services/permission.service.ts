@@ -1,6 +1,7 @@
 import { PermissionRepository } from '../repositories/permission.repository';
 import { PermissionCreateInput, PermissionUpdateInput } from '../models/permission.model';
 import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
+import { calculateSkip } from '../utils/pagination.util';
 
 /**
  * Permission Service - Business logic layer for Permission
@@ -39,7 +40,8 @@ export class PermissionService {
     sortBy?: string,
     sortOrder?: 'asc' | 'desc'
   ) {
-    const permissions = await this.repository.findAll(page, limit, sortBy, sortOrder);
+    const skip = calculateSkip(page, limit);
+    const permissions = await this.repository.findAll(skip, limit, sortBy, sortOrder);
     const total = await this.repository.count();
     return { permissions, total };
   }

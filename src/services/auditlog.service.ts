@@ -2,6 +2,7 @@ import { AuditLogRepository } from '../repositories/auditlog.repository';
 import { NotFoundError } from '../utils/errors.util';
 import { AuditLog } from '../models/auditlog.model';
 import { Types } from 'mongoose';
+import { calculateSkip } from '../utils/pagination.util';
 
 /**
  * AuditLog Service - Business logic layer for AuditLog
@@ -52,21 +53,21 @@ export class AuditLogService {
     sortBy?: string,
     sortOrder?: 'asc' | 'desc'
   ) {
-    const skip = (page - 1) * limit;
+    const skip = calculateSkip(page, limit);
     const logs = await this.repository.findAll(skip, limit, sortBy, sortOrder);
     const total = await this.repository.count();
     return { logs, total };
   }
 
   async getAuditLogsByUserId(userId: string, page: number, limit: number) {
-    const skip = (page - 1) * limit;
+    const skip = calculateSkip(page, limit);
     const logs = await this.repository.findByUserId(userId, skip, limit);
     const total = await this.repository.countByUserId(userId);
     return { logs, total };
   }
 
   async getAuditLogsByResource(resource: string, page: number, limit: number) {
-    const skip = (page - 1) * limit;
+    const skip = calculateSkip(page, limit);
     const logs = await this.repository.findByResource(resource, skip, limit);
     const total = await this.repository.countByResource(resource);
     return { logs, total };
