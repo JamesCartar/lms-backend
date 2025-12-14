@@ -44,12 +44,14 @@ export const errorHandler = (
     return sendErrorResponse(res, 'Invalid ID format', 400);
   }
 
-  if (error.name === 'MongoServerError' || (error as any).code === 11000) {
+  if (error.name === 'MongoServerError' || ('code' in error && (error as { code: number }).code === 11000)) {
     return sendErrorResponse(res, 'Duplicate key error', 409);
   }
 
   // Handle generic errors
-  const statusCode = (error as any).statusCode || 500;
+  const statusCode = 'statusCode' in error && typeof (error as { statusCode: number }).statusCode === 'number'
+    ? (error as { statusCode: number }).statusCode
+    : 500;
   const message = error.message || 'Internal server error';
 
   return sendErrorResponse(res, message, statusCode);
@@ -59,7 +61,9 @@ export const errorHandler = (
  * Async handler wrapper to catch async errors
  * Wraps async route handlers to catch errors and pass to error handler
  */
-export const asyncHandler = (fn: Function) => {
+export const asyncHandler = (
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>
+) => {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };

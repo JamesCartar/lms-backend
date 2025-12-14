@@ -16,7 +16,6 @@ declare global {
   namespace Express {
     interface Request {
       jwt?: JwtPayload;
-      user?: any;
     }
   }
 }

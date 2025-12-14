@@ -3,6 +3,8 @@ import { PermissionRepository } from '../repositories/permission.repository';
 import { RoleCreateInput, RoleUpdateInput } from '../models/role.model';
 import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
 import { calculateSkip } from '../utils/pagination.util';
+import { Ref } from '@typegoose/typegoose';
+import { Permission } from '../models/permission.model';
 
 /**
  * Role Service - Business logic layer for Role
@@ -38,8 +40,8 @@ export class RoleService {
     return await this.repository.create({
       name: data.name,
       description: data.description,
-      // Type assertion needed: Zod validates as string[], Typegoose expects Ref<Permission>[]
-      permissions: data.permissions as any,
+      // Zod validates as string[] (ObjectIds), which is valid for Mongoose references
+      permissions: data.permissions as Ref<Permission>[] | undefined,
     });
   }
 
@@ -82,8 +84,8 @@ export class RoleService {
     const role = await this.repository.update(id, {
       name: data.name,
       description: data.description,
-      // Type assertion needed: Zod validates as string[], Typegoose expects Ref<Permission>[]
-      permissions: data.permissions as any,
+      // Zod validates as string[] (ObjectIds), which is valid for Mongoose references
+      permissions: data.permissions as Ref<Permission>[] | undefined,
     });
     if (!role) {
       throw new NotFoundError('Role not found');

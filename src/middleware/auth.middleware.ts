@@ -39,7 +39,6 @@ export const authenticate = async (
 
     // Attach decoded payload to request
     req.jwt = decoded;
-    req.user = decoded; // Also set user for compatibility
 
     next();
   } catch (error) {
@@ -83,7 +82,6 @@ export const optionalAuthenticate = async (
 
     const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
     req.jwt = decoded;
-    req.user = decoded;
 
     next();
   } catch (error) {

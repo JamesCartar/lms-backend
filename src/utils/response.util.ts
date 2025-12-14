@@ -1,22 +1,23 @@
 import { Response } from 'express';
 import { PaginationMeta } from './pagination.util';
+import { ValidationErrors } from '../types/validation.types';
 
 /**
  * Standard Response Format Interface
  */
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
   pagination?: PaginationMeta;
-  errors?: any[];
+  errors?: ValidationErrors;
   timestamp: string;
 }
 
 /**
  * Send success response with consistent format
  */
-export const sendSuccessResponse = <T = any>(
+export const sendSuccessResponse = <T = unknown>(
   res: Response,
   data: T,
   message?: string,
@@ -44,7 +45,7 @@ export const sendErrorResponse = (
   res: Response,
   message: string,
   statusCode: number = 500,
-  errors?: any[]
+  errors?: ValidationErrors
 ): Response => {
   const response: ApiResponse = {
     success: false,

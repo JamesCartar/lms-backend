@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Types } from 'mongoose';
 
 /**
  * Utility to create Zod schemas from Typegoose model properties
@@ -26,7 +27,7 @@ export const createNumberSchema = (required: boolean = true, min?: number, max?:
 };
 
 export const createDateSchema = (required: boolean = true) => {
-  const schema = z.union([z.string().datetime(), z.date()]).transform((val) => 
+  const schema = z.union([z.string().datetime(), z.date()]).transform((val: string | Date) => 
     typeof val === 'string' ? new Date(val) : val
   );
   return required ? schema : schema.optional();
@@ -50,4 +51,19 @@ export const createObjectIdSchema = (required: boolean = true) => {
 export const createEnumSchema = <T extends [string, ...string[]]>(values: T, required: boolean = true) => {
   const schema = z.enum(values);
   return required ? schema : schema.optional();
+};
+
+/**
+ * Converts a string ObjectId to a Mongoose Types.ObjectId
+ * This is useful when passing validated Zod input to Mongoose/Typegoose
+ */
+export const toObjectId = (id: string): Types.ObjectId => {
+  return new Types.ObjectId(id);
+};
+
+/**
+ * Converts an array of string ObjectIds to Mongoose Types.ObjectId array
+ */
+export const toObjectIdArray = (ids: string[]): Types.ObjectId[] => {
+  return ids.map(id => new Types.ObjectId(id));
 };

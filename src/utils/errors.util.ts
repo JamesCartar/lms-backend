@@ -3,6 +3,8 @@
  * These provide consistent error handling across the application
  */
 
+import { ValidationErrors } from '../types/validation.types';
+
 /**
  * Base Application Error
  */
@@ -67,9 +69,9 @@ export class ConflictError extends AppError {
  * 422 Validation Error
  */
 export class ValidationError extends AppError {
-  public errors?: any[];
+  public errors?: ValidationErrors;
 
-  constructor(message: string = 'Validation failed', errors?: any[]) {
+  constructor(message: string = 'Validation failed', errors?: ValidationErrors) {
     super(message, 422);
     this.errors = errors;
   }

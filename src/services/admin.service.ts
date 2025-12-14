@@ -3,6 +3,8 @@ import { RoleRepository } from '../repositories/role.repository';
 import { AdminCreateInput, AdminUpdateInput } from '../models/admin.model';
 import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
 import { calculateSkip } from '../utils/pagination.util';
+import { Ref } from '@typegoose/typegoose';
+import { Role } from '../models/role.model';
 
 /**
  * Admin Service - Business logic layer for Admin
@@ -40,8 +42,8 @@ export class AdminService {
       name: data.name,
       email: data.email,
       password: data.password,
-      // Type assertion needed: Zod validates as string, Typegoose expects Ref<Role>
-      role: data.role as any,
+      // Zod validates as string (ObjectId), which is valid for Mongoose references
+      role: data.role as Ref<Role> | undefined,
       isActive: data.isActive,
     });
   }
@@ -87,8 +89,8 @@ export class AdminService {
       name: data.name,
       email: data.email,
       password: data.password,
-      // Type assertion needed: Zod validates as string, Typegoose expects Ref<Role>
-      role: data.role as any,
+      // Zod validates as string (ObjectId), which is valid for Mongoose references
+      role: data.role as Ref<Role> | undefined,
       isActive: data.isActive,
     });
     if (!admin) {
