@@ -22,7 +22,7 @@ export type StudentFilterQuery = z.infer<typeof StudentFilterQuerySchema>;
 /**
  * Build MongoDB filter object from validated query parameters
  */
-export const buildStudentFilter = (query: StudentFilterQuery): Record<string, any> => {
+export const buildStudentFilter = (query: Partial<StudentFilterQuery>): Record<string, any> => {
   const filters: Record<string, any>[] = [];
 
   // Search filter - searches across name and email fields

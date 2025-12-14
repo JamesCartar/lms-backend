@@ -20,7 +20,7 @@ export type PermissionFilterQuery = z.infer<typeof PermissionFilterQuerySchema>;
 /**
  * Build MongoDB filter object from validated query parameters
  */
-export const buildPermissionFilter = (query: PermissionFilterQuery): Record<string, any> => {
+export const buildPermissionFilter = (query: Partial<PermissionFilterQuery>): Record<string, any> => {
   const filters: Record<string, any>[] = [];
 
   // Search filter - searches across name, resource, action, and description fields

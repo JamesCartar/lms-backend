@@ -22,7 +22,7 @@ export type AuditLogFilterQuery = z.infer<typeof AuditLogFilterQuerySchema>;
 /**
  * Build MongoDB filter object from validated query parameters
  */
-export const buildAuditLogFilter = (query: AuditLogFilterQuery): Record<string, any> => {
+export const buildAuditLogFilter = (query: Partial<AuditLogFilterQuery>): Record<string, any> => {
   const filters: Record<string, any>[] = [];
 
   // Search filter - searches across email and resource fields

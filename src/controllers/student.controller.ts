@@ -5,7 +5,7 @@ import { asyncHandler } from '../middleware/error.middleware';
 import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 import { getIdParam, getRequiredParam } from '../utils/params.util';
 import { BadRequestError } from '../utils/errors.util';
-import { buildStudentFilter, StudentFilterQuery } from '../filters/student.filter';
+import { buildStudentFilter } from '../filters/student.filter';
 
 /**
  * Student Controller - Handles HTTP requests for Student
@@ -31,8 +31,8 @@ export class StudentController {
     const { page, limit, sortBy, sortOrder } = getPaginationParams(req);
     
     // Get validated filter query from middleware
-    const filterQuery = (req as any).validatedQuery as StudentFilterQuery;
-    const filter = buildStudentFilter(filterQuery || {});
+    const filterQuery = req.validatedQuery || {};
+    const filter = buildStudentFilter(filterQuery);
     
     const { students, total } = await this.service.getAllStudents(page, limit, sortBy, sortOrder, filter);
     const pagination = calculatePaginationMeta(page, limit, total);

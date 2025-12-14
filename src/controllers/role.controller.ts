@@ -4,7 +4,7 @@ import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
 import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 import { getIdParam } from '../utils/params.util';
-import { buildRoleFilter, RoleFilterQuery } from '../filters/role.filter';
+import { buildRoleFilter } from '../filters/role.filter';
 
 /**
  * Role Controller - Handles HTTP requests for Role
@@ -30,8 +30,8 @@ export class RoleController {
     const { page, limit, sortBy, sortOrder } = getPaginationParams(req);
     
     // Get validated filter query from middleware
-    const filterQuery = (req as any).validatedQuery as RoleFilterQuery;
-    const filter = buildRoleFilter(filterQuery || {});
+    const filterQuery = req.validatedQuery || {};
+    const filter = buildRoleFilter(filterQuery);
     
     const { roles, total } = await this.service.getAllRoles(page, limit, sortBy, sortOrder, filter);
     const pagination = calculatePaginationMeta(page, limit, total);

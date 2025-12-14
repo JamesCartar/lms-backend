@@ -20,7 +20,7 @@ export type AdminFilterQuery = z.infer<typeof AdminFilterQuerySchema>;
 /**
  * Build MongoDB filter object from validated query parameters
  */
-export const buildAdminFilter = (query: AdminFilterQuery): Record<string, any> => {
+export const buildAdminFilter = (query: Partial<AdminFilterQuery>): Record<string, any> => {
   const filters: Record<string, any>[] = [];
 
   // Search filter - searches across name and email fields
