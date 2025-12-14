@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { ValidationError } from '../utils/errors.util';
 import { ValidatedQuery } from '../types/request.types';
-import '../types/request.types';
 
 /**
  * Convert Zod error messages to user-friendly messages

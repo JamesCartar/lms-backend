@@ -6,7 +6,6 @@ import { getPaginationParams, calculatePaginationMeta } from '../utils/paginatio
 import { getIdParam, getRequiredParam } from '../utils/params.util';
 import { BadRequestError } from '../utils/errors.util';
 import { buildStudentFilter } from '../filters/student.filter';
-import '../types/request.types';
 
 /**
  * Student Controller - Handles HTTP requests for Student

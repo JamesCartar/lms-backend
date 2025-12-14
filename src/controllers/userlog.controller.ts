@@ -5,7 +5,6 @@ import { asyncHandler } from '../middleware/error.middleware';
 import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 import { getIdParam, getRequiredParam } from '../utils/params.util';
 import { buildUserLogFilter } from '../filters/userlog.filter';
-import '../types/request.types';
 
 /**
  * UserLog Controller - Handles HTTP requests for UserLog

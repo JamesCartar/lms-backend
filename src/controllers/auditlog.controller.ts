@@ -5,7 +5,6 @@ import { asyncHandler } from '../middleware/error.middleware';
 import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 import { getIdParam, getRequiredParam } from '../utils/params.util';
 import { buildAuditLogFilter } from '../filters/auditlog.filter';
-import '../types/request.types';
 
 /**
  * AuditLog Controller - Handles HTTP requests for AuditLog

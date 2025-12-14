@@ -5,7 +5,6 @@ import { asyncHandler } from '../middleware/error.middleware';
 import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 import { getIdParam } from '../utils/params.util';
 import { buildRoleFilter } from '../filters/role.filter';
-import '../types/request.types';
 
 /**
  * Role Controller - Handles HTTP requests for Role

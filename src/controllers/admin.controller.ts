@@ -5,7 +5,6 @@ import { asyncHandler } from '../middleware/error.middleware';
 import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 import { getIdParam } from '../utils/params.util';
 import { buildAdminFilter } from '../filters/admin.filter';
-import '../types/request.types';
 
 /**
  * Admin Controller - Handles HTTP requests for Admin
