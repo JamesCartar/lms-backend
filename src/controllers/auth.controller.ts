@@ -5,7 +5,7 @@ import { AdminModel } from '../models/admin.model';
 import { StudentModel } from '../models/student.model';
 import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
-import { UnauthorizedError, BadRequestError } from '../utils/errors.util';
+import { UnauthorizedError } from '../utils/errors.util';
 import { UserLogService } from '../services/userlog.service';
 import { PopulatedRole, hasPermissionDocuments } from '../types/populated.types';
 
@@ -23,11 +23,8 @@ export class AuthController {
    * Admin login
    */
   loginAdmin = asyncHandler(async (req: Request, res: Response) => {
+    // AdminLoginSchema validation ensures email and password are present
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      throw new BadRequestError('Email and password are required');
-    }
 
     // Find admin by email
     const admin = await AdminModel.findOne({ email }).populate({
@@ -113,11 +110,8 @@ export class AuthController {
    * Student login
    */
   loginStudent = asyncHandler(async (req: Request, res: Response) => {
+    // StudentLoginSchema validation ensures email and password are present
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      throw new BadRequestError('Email and password are required');
-    }
 
     // Find student by email
     const student = await StudentModel.findOne({ email });

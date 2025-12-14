@@ -1,7 +1,7 @@
 import { RoleRepository } from '../repositories/role.repository';
 import { PermissionRepository } from '../repositories/permission.repository';
 import { RoleCreateInput, RoleUpdateInput } from '../models/role.model';
-import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
+import { NotFoundError, ConflictError } from '../utils/errors.util';
 import { calculateSkip } from '../utils/pagination.util';
 import { Ref } from '@typegoose/typegoose';
 import { Permission } from '../models/permission.model';
@@ -19,12 +19,8 @@ export class RoleService {
   }
 
   async createRole(data: RoleCreateInput) {
-    // Validation ensures name exists, but TypeScript doesn't know that
-    if (!data.name) {
-      throw new BadRequestError('Name is required');
-    }
-    
-    const existing = await this.repository.findByName(data.name);
+    // RoleCreateSchema validation ensures required fields are present
+    const existing = await this.repository.findByName(data.name!);
     if (existing) {
       throw new ConflictError('Role with this name already exists');
     }
