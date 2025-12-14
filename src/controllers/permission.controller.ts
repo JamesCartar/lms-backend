@@ -4,6 +4,7 @@ import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
 import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 import { getIdParam } from '../utils/params.util';
+import { buildPermissionFilter, PermissionFilterQuery } from '../filters/permission.filter';
 
 /**
  * Permission Controller - Handles HTTP requests for Permission
@@ -27,7 +28,12 @@ export class PermissionController {
 
   getAll = asyncHandler(async (req: Request, res: Response) => {
     const { page, limit, sortBy, sortOrder } = getPaginationParams(req);
-    const { permissions, total } = await this.service.getAllPermissions(page, limit, sortBy, sortOrder);
+    
+    // Get validated filter query from middleware
+    const filterQuery = (req as any).validatedQuery as PermissionFilterQuery;
+    const filter = buildPermissionFilter(filterQuery || {});
+    
+    const { permissions, total } = await this.service.getAllPermissions(page, limit, sortBy, sortOrder, filter);
     const pagination = calculatePaginationMeta(page, limit, total);
     sendSuccessResponse(res, permissions, 'Permissions retrieved successfully', 200, pagination);
   });

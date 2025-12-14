@@ -18,20 +18,21 @@ export class AuditLogRepository {
     skip: number,
     limit: number,
     sortBy: string = 'timestamp',
-    sortOrder: 'asc' | 'desc' = 'desc'
+    sortOrder: 'asc' | 'desc' = 'desc',
+    filter: Record<string, any> = {}
   ): Promise<DocumentType<AuditLog>[]> {
     const sortObj: Record<string, 1 | -1> = {
       [sortBy]: sortOrder === 'asc' ? 1 : -1,
     };
     
-    return await AuditLogModel.find()
+    return await AuditLogModel.find(filter)
       .sort(sortObj)
       .skip(skip)
       .limit(limit);
   }
 
-  async count(): Promise<number> {
-    return await AuditLogModel.countDocuments();
+  async count(filter: Record<string, any> = {}): Promise<number> {
+    return await AuditLogModel.countDocuments(filter);
   }
 
   async findByUserId(

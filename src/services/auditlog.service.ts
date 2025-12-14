@@ -50,11 +50,12 @@ export class AuditLogService {
     page: number,
     limit: number,
     sortBy?: string,
-    sortOrder?: 'asc' | 'desc'
+    sortOrder?: 'asc' | 'desc',
+    filter: Record<string, any> = {}
   ) {
     const skip = calculateSkip(page, limit);
-    const logs = await this.repository.findAll(skip, limit, sortBy, sortOrder);
-    const total = await this.repository.count();
+    const logs = await this.repository.findAll(skip, limit, sortBy, sortOrder, filter);
+    const total = await this.repository.count(filter);
     return { logs, total };
   }
 
