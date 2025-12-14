@@ -49,14 +49,14 @@ const makeErrorMessageUserFriendly = (message: string, path: string): string => 
   }
   if (message.includes('Too small') || message.includes('too_small') || message.includes('String must contain at least')) {
     // Handle "Too small: expected string to have >=N characters" format
-    const match = message.match(/>=(\d+) characters/) || message.match(/at least (\d+)/);
+    const match = message.match(/>=\s*(\d+)\s+characters?/) || message.match(/at least (\d+)/);
     if (match) {
       return `${path} must be at least ${match[1]} characters long`;
     }
   }
   if (message.includes('Too big') || message.includes('too_big') || message.includes('String must contain at most')) {
     // Handle "Too big: expected string to have <=N characters" format
-    const match = message.match(/<=(\d+) characters/) || message.match(/at most (\d+)/);
+    const match = message.match(/<=\s*(\d+)\s+characters?/) || message.match(/at most (\d+)/);
     if (match) {
       return `${path} must be at most ${match[1]} characters long`;
     }
