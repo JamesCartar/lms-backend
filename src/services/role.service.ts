@@ -36,6 +36,7 @@ export class RoleService {
     return await this.repository.create({
       name: data.name,
       description: data.description,
+      // Type assertion needed: Zod validates as string[], Typegoose expects Ref<Permission>[]
       permissions: data.permissions as any,
     });
   }
@@ -71,6 +72,7 @@ export class RoleService {
     const role = await this.repository.update(id, {
       name: data.name,
       description: data.description,
+      // Type assertion needed: Zod validates as string[], Typegoose expects Ref<Permission>[]
       permissions: data.permissions as any,
     });
     if (!role) {

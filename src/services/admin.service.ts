@@ -38,6 +38,7 @@ export class AdminService {
       name: data.name,
       email: data.email,
       password: data.password,
+      // Type assertion needed: Zod validates as string, Typegoose expects Ref<Role>
       role: data.role as any,
       isActive: data.isActive,
     });
@@ -76,6 +77,7 @@ export class AdminService {
       name: data.name,
       email: data.email,
       password: data.password,
+      // Type assertion needed: Zod validates as string, Typegoose expects Ref<Role>
       role: data.role as any,
       isActive: data.isActive,
     });
