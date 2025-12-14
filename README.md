@@ -6,9 +6,9 @@ A Learning Management System (LMS) backend built with Node.js, TypeScript, Expre
 
 This project follows a layered architecture pattern:
 
-1. **Router Layer** - Route definitions and endpoint mappings
+1. **Router Layer** - Route definitions and endpoint mappings with authentication
 2. **Controller Layer** - HTTP request/response handling
-3. **Service Layer** - Business logic
+3. **Service Layer** - Business logic with error handling
 4. **Repository Layer** - Data access and database operations
 
 ## Key Features
@@ -16,7 +16,11 @@ This project follows a layered architecture pattern:
 - **Type Safety**: Single source of truth for types using Typegoose
 - **Validation**: Zod schemas derived from Typegoose models
 - **CRUD Operations**: Complete CRUD for Admin, Role, Permission, and Student entities
-- **Role-Based Access**: Admin users with roles and permissions
+- **Authentication**: JWT-based authentication for admin and student users
+- **Authorization**: Role-based access control with fine-grained permissions
+- **Error Handling**: Global error handler with consistent response format
+- **Security**: Password hashing with bcrypt, JWT token validation
+- **Database Seeding**: Automated seeding for initial data setup
 - **Clean Architecture**: Separation of concerns across layers
 
 ## Technology Stack
@@ -26,6 +30,8 @@ This project follows a layered architecture pattern:
 - **Database**: MongoDB
 - **ODM**: Typegoose (TypeScript wrapper for Mongoose)
 - **Validation**: Zod
+- **Authentication**: JWT (jsonwebtoken)
+- **Password Hashing**: bcrypt
 - **Dev Tools**: Nodemon, ts-node
 
 ## Project Structure
@@ -35,11 +41,13 @@ src/
 ├── config/          # Configuration files (database)
 ├── models/          # Typegoose models and Zod schemas
 ├── repositories/    # Data access layer
-├── services/        # Business logic layer
-├── controllers/     # Request handlers
-├── routes/          # Route definitions
-├── middleware/      # Custom middleware (validation)
-├── utils/           # Utility functions (schema helpers)
+├── services/        # Business logic layer with custom error handling
+├── controllers/     # Request handlers with async error handling
+├── routes/          # Route definitions with auth and permission middleware
+├── middleware/      # Custom middleware (auth, permissions, validation, error handling)
+├── utils/           # Utility functions (errors, response formatting, schema helpers)
+├── types/           # TypeScript type definitions (JWT payload)
+├── seeds/           # Database seeding scripts
 └── index.ts         # Application entry point
 ```
 
@@ -55,23 +63,37 @@ npm install
 cp .env.example .env
 ```
 
-3. Update `.env` with your MongoDB connection string:
+3. Update `.env` with your configuration:
 ```
 PORT=3000
 MONGODB_URI=mongodb://localhost:27017/lms
+JWT_SECRET=your-secret-key-change-this-in-production
 ```
 
-4. Start development server:
+**Important:** Use a strong, unique `JWT_SECRET` in production!
+
+4. Seed the database with initial data:
+```bash
+npm run seed
+```
+
+This creates:
+- 16 permissions (CRUD for admin, role, student, permission)
+- 4 roles (Super Admin, Admin, Manager, Viewer)
+- Default admin user: `admin@example.com` / `admin123`
+- 5 sample students
+
+5. Start development server:
 ```bash
 npm run dev
 ```
 
-5. Build for production:
+6. Build for production:
 ```bash
 npm run build
 ```
 
-6. Run production build:
+7. Run production build:
 ```bash
 npm start
 ```
@@ -79,36 +101,62 @@ npm start
 ## API Endpoints
 
 ### Health Check
-- `GET /health` - Check if server is running
+- `GET /health` - Check if server is running (no auth required)
 
-### Permissions
-- `POST /api/v1/permissions` - Create a new permission
-- `GET /api/v1/permissions` - Get all permissions
-- `GET /api/v1/permissions/:id` - Get permission by ID
-- `PUT /api/v1/permissions/:id` - Update permission
-- `DELETE /api/v1/permissions/:id` - Delete permission
+### Authentication
+- `POST /api/v1/auth/login/admin` - Admin login (returns JWT token)
+- `POST /api/v1/auth/login/student` - Student login (returns JWT token)
+- `GET /api/v1/auth/me` - Get current user info (requires auth)
 
-### Roles
-- `POST /api/v1/roles` - Create a new role
-- `GET /api/v1/roles` - Get all roles
-- `GET /api/v1/roles/:id` - Get role by ID
-- `PUT /api/v1/roles/:id` - Update role
-- `DELETE /api/v1/roles/:id` - Delete role
+### Permissions (requires authentication + admin type + permission.* permissions)
+- `POST /api/v1/permissions` - Create a new permission (requires permission.create)
+- `GET /api/v1/permissions` - Get all permissions (requires permission.read)
+- `GET /api/v1/permissions/:id` - Get permission by ID (requires permission.read)
+- `PUT /api/v1/permissions/:id` - Update permission (requires permission.update)
+- `DELETE /api/v1/permissions/:id` - Delete permission (requires permission.delete)
 
-### Admins
-- `POST /api/v1/admins` - Create a new admin
-- `GET /api/v1/admins` - Get all admins
-- `GET /api/v1/admins/:id` - Get admin by ID
-- `PUT /api/v1/admins/:id` - Update admin
-- `DELETE /api/v1/admins/:id` - Delete admin
+### Roles (requires authentication + admin type + role.* permissions)
+- `POST /api/v1/roles` - Create a new role (requires role.create)
+- `GET /api/v1/roles` - Get all roles (requires role.read)
+- `GET /api/v1/roles/:id` - Get role by ID (requires role.read)
+- `PUT /api/v1/roles/:id` - Update role (requires role.update)
+- `DELETE /api/v1/roles/:id` - Delete role (requires role.delete)
 
-### Students
-- `POST /api/v1/students` - Create a new student
-- `GET /api/v1/students` - Get all students
-- `GET /api/v1/students/:id` - Get student by ID
-- `GET /api/v1/students/year/:year` - Get students by enrollment year
-- `PUT /api/v1/students/:id` - Update student
-- `DELETE /api/v1/students/:id` - Delete student
+### Admins (requires authentication + admin type + admin.* permissions)
+- `POST /api/v1/admins` - Create a new admin (requires admin.create)
+- `GET /api/v1/admins` - Get all admins (requires admin.read)
+- `GET /api/v1/admins/:id` - Get admin by ID (requires admin.read)
+- `PUT /api/v1/admins/:id` - Update admin (requires admin.update)
+- `DELETE /api/v1/admins/:id` - Delete admin (requires admin.delete)
+
+### Students (requires authentication + admin type + student.* permissions)
+- `POST /api/v1/students` - Create a new student (requires student.create)
+- `GET /api/v1/students` - Get all students (requires student.read)
+- `GET /api/v1/students/:id` - Get student by ID (requires student.read)
+- `GET /api/v1/students/year/:year` - Get students by enrollment year (requires student.read)
+- `PUT /api/v1/students/:id` - Update student (requires student.update)
+- `DELETE /api/v1/students/:id` - Delete student (requires student.delete)
+
+## Authentication & Authorization
+
+All protected endpoints require:
+1. Valid JWT token in Authorization header: `Bearer <token>`
+2. User must be admin type (for admin, role, permission, student endpoints)
+3. User must have appropriate permissions
+
+**Example Usage:**
+```bash
+# 1. Login
+curl -X POST http://localhost:3000/api/v1/auth/login/admin \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"admin123"}'
+
+# 2. Use the returned token
+curl -X GET http://localhost:3000/api/v1/students \
+  -H "Authorization: Bearer <your-token-here>"
+```
+
+See [AUTHENTICATION_GUIDE.md](./AUTHENTICATION_GUIDE.md) for detailed documentation.
 
 ## Type Definition Strategy
 
@@ -151,16 +199,52 @@ This approach ensures:
 
 The project uses:
 - **TypeScript** for type safety
-- **Nodemon** for automatic server restart
-- **ts-node** for running TypeScript directly
+- **Nodemon** for automatic server restart during development
+- **ts-node** for running TypeScript directly without compilation
+- **Zod** for runtime validation
+- **JWT** for stateless authentication
+
+## Documentation
+
+- [AUTHENTICATION_GUIDE.md](./AUTHENTICATION_GUIDE.md) - Complete guide to authentication, permissions, and error handling
+- [SECURITY.md](./SECURITY.md) - Security analysis and recommendations
+- [API_EXAMPLES.md](./API_EXAMPLES.md) - API usage examples
+
+## Scripts
+
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build for production
+- `npm start` - Run production build
+- `npm run seed` - Seed database with initial data
+
+## Implemented Features
+
+✅ Custom error classes for consistent error handling  
+✅ Global error handler middleware  
+✅ Consistent API response format  
+✅ JWT-based authentication  
+✅ Permission-based authorization  
+✅ Password hashing with bcrypt  
+✅ Database seeding scripts  
+✅ Request validation with Zod  
+✅ Type-safe models with Typegoose  
+✅ Async error handling  
+✅ Environment variable configuration  
 
 ## Future Enhancements
 
-- Add authentication (JWT)
-- Add password hashing (bcrypt)
-- Add logging (Winston/Morgan)
-- Add API documentation (Swagger)
-- Add testing (Jest)
-- Add rate limiting
-- Add CORS configuration
-- Add environment-specific configurations
+Consider implementing:
+
+- ⚠️ **Rate limiting** (high priority for production)
+- Refresh token mechanism
+- Password reset functionality
+- Email verification
+- Two-factor authentication (2FA)
+- Logging system (Winston/Morgan)
+- API documentation (Swagger/OpenAPI)
+- Testing framework (Jest)
+- CORS configuration
+- Helmet.js for security headers
+- Account lockout after failed attempts
+- Audit logging
+- Environment-specific configurations
