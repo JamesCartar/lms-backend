@@ -77,13 +77,15 @@ export const validate = (schema: z.ZodSchema) => {
 
 /**
  * Validation middleware for query parameters validation using Zod schemas
+ * Uses generics to maintain type safety throughout the validation process
  */
-export const validateQuery = (schema: z.ZodSchema) => {
+export const validateQuery = <T extends ValidatedQuery>(schema: z.ZodSchema<T>) => {
   return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       const validated = await schema.parseAsync(req.query);
       // Store validated query in req for later use
-      req.validatedQuery = validated as unknown as ValidatedQuery;
+      // The validated result is guaranteed to match T by Zod's runtime validation
+      req.validatedQuery = validated;
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
