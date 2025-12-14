@@ -29,7 +29,11 @@ export class AuthController {
     // Find admin by email
     const admin = await AdminModel.findOne({ email }).populate({
       path: 'role',
-      populate: { path: 'permissions' }
+      select: 'name description type permissions',
+      populate: { 
+        path: 'permissions',
+        select: 'name resource action description'
+      }
     });
 
     if (!admin) {
@@ -190,7 +194,11 @@ export class AuthController {
     if (type === 'admin') {
       user = await AdminModel.findById(id).select('-password').populate({
         path: 'role',
-        populate: { path: 'permissions' }
+        select: 'name description type permissions',
+        populate: { 
+          path: 'permissions',
+          select: 'name resource action description'
+        }
       });
     } else {
       user = await StudentModel.findById(id).select('-password');

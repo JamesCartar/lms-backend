@@ -10,11 +10,17 @@ export class AdminRepository {
   }
 
   async findById(id: string): Promise<DocumentType<Admin> | null> {
-    return await AdminModel.findById(id).populate('role');
+    return await AdminModel.findById(id).populate({
+      path: 'role',
+      select: 'name description type'
+    });
   }
 
   async findByEmail(email: string): Promise<DocumentType<Admin> | null> {
-    return await AdminModel.findOne({ email }).populate('role');
+    return await AdminModel.findOne({ email }).populate({
+      path: 'role',
+      select: 'name description type'
+    });
   }
 
   async findAll(
@@ -29,7 +35,10 @@ export class AdminRepository {
     };
     
     return await AdminModel.find(filter)
-      .populate('role')
+      .populate({
+        path: 'role',
+        select: 'name description type'
+      })
       .sort(sortObj)
       .skip(skip)
       .limit(limit);
@@ -40,7 +49,10 @@ export class AdminRepository {
   }
 
   async update(id: string, data: Partial<Admin>): Promise<DocumentType<Admin> | null> {
-    return await AdminModel.findByIdAndUpdate(id, data, { new: true }).populate('role');
+    return await AdminModel.findByIdAndUpdate(id, data, { new: true }).populate({
+      path: 'role',
+      select: 'name description type'
+    });
   }
 
   async delete(id: string): Promise<DocumentType<Admin> | null> {

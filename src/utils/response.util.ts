@@ -4,18 +4,27 @@ import { ValidationErrors } from '../types/validation.types';
 
 /**
  * Standard Response Format Interface
+ * Note: Pagination is now part of data when present
  */
 export interface ApiResponse<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;
-  pagination?: PaginationMeta;
   errors?: ValidationErrors;
   timestamp: string;
 }
 
 /**
+ * Paginated data wrapper
+ */
+export interface PaginatedData<T> {
+  items: T;
+  pagination: PaginationMeta;
+}
+
+/**
  * Send success response with consistent format
+ * If pagination is provided, data is wrapped with pagination
  */
 export const sendSuccessResponse = <T = unknown>(
   res: Response,
@@ -24,22 +33,23 @@ export const sendSuccessResponse = <T = unknown>(
   statusCode: number = 200,
   pagination?: PaginationMeta
 ): Response => {
-  const response: ApiResponse<T> = {
+  const responseData = pagination 
+    ? { items: data, pagination } as PaginatedData<T>
+    : data;
+
+  const response: ApiResponse<typeof responseData> = {
     success: true,
     message,
-    data,
+    data: responseData,
     timestamp: new Date().toISOString(),
   };
-
-  if (pagination) {
-    response.pagination = pagination;
-  }
 
   return res.status(statusCode).json(response);
 };
 
 /**
  * Send success response with data wrapped in a resource key
+ * If pagination is provided, data is wrapped with pagination
  */
 export const sendSuccessResponseWithResource = <T = unknown>(
   res: Response,
@@ -49,18 +59,19 @@ export const sendSuccessResponseWithResource = <T = unknown>(
   statusCode: number = 200,
   pagination?: PaginationMeta
 ): Response => {
-  const wrappedData = { [resourceKey]: data } as any;
+  type WrappedData = { [key: string]: T };
+  const wrappedData: WrappedData = { [resourceKey]: data };
   
-  const response: ApiResponse<typeof wrappedData> = {
+  const responseData = pagination 
+    ? { items: wrappedData, pagination } as PaginatedData<WrappedData>
+    : wrappedData;
+
+  const response: ApiResponse<typeof responseData> = {
     success: true,
     message,
-    data: wrappedData,
+    data: responseData,
     timestamp: new Date().toISOString(),
   };
-
-  if (pagination) {
-    response.pagination = pagination;
-  }
 
   return res.status(statusCode).json(response);
 };
