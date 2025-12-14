@@ -1,7 +1,7 @@
-import { AuditLogModel, type AuditLog } from "../models/auditlog.model";
 import type { DocumentType } from "@typegoose/typegoose";
 import type { FilterQuery } from "mongoose";
 import { Types } from "mongoose";
+import { type AuditLog, AuditLogModel } from "../models/auditlog.model";
 
 /**
  * AuditLog Repository - Data access layer for AuditLog

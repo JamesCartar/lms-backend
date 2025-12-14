@@ -1,10 +1,10 @@
-import { z } from "zod";
 import type { FilterQuery } from "mongoose";
+import { z } from "zod";
 import type { Student } from "../models/student.model";
 import {
 	BaseFilterQuerySchema,
-	buildSearchFilter,
 	buildDateRangeFilter,
+	buildSearchFilter,
 	mergeFilters,
 } from "../utils/filter.util";
 
@@ -50,7 +50,10 @@ export const buildStudentFilter = (
 	}
 
 	// Date range filters
-	const dateFilter = buildDateRangeFilter(query.createdBefore, query.createdAfter);
+	const dateFilter = buildDateRangeFilter(
+		query.createdBefore,
+		query.createdAfter,
+	);
 	if (Object.keys(dateFilter).length > 0) {
 		filters.push(dateFilter);
 	}

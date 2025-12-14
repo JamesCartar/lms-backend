@@ -1,10 +1,10 @@
-import { z } from "zod";
 import type { FilterQuery } from "mongoose";
+import { z } from "zod";
 import type { UserLog } from "../models/userlog.model";
 import {
 	BaseFilterQuerySchema,
-	buildSearchFilter,
 	buildDateRangeFilter,
+	buildSearchFilter,
 	mergeFilters,
 } from "../utils/filter.util";
 
@@ -16,7 +16,10 @@ import {
  * UserLog-specific filter query schema
  */
 export const UserLogFilterQuerySchema = BaseFilterQuerySchema.extend({
-	userId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(), // MongoDB ObjectId format
+	userId: z
+		.string()
+		.regex(/^[0-9a-fA-F]{24}$/)
+		.optional(), // MongoDB ObjectId format
 	userType: z.enum(["admin", "student"]).optional(),
 	email: z.string().email().optional(),
 	ip: z.string().min(1).max(45).optional(), // Support IPv4 and IPv6

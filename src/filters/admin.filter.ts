@@ -1,10 +1,10 @@
-import { z } from "zod";
 import type { FilterQuery } from "mongoose";
+import { z } from "zod";
 import type { Admin } from "../models/admin.model";
 import {
 	BaseFilterQuerySchema,
-	buildSearchFilter,
 	buildDateRangeFilter,
+	buildSearchFilter,
 	mergeFilters,
 } from "../utils/filter.util";
 
@@ -18,7 +18,10 @@ import {
 export const AdminFilterQuerySchema = BaseFilterQuerySchema.extend({
 	name: z.string().min(1).max(100).optional(),
 	email: z.string().email().optional(),
-	role: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(), // MongoDB ObjectId format
+	role: z
+		.string()
+		.regex(/^[0-9a-fA-F]{24}$/)
+		.optional(), // MongoDB ObjectId format
 	isActive: z
 		.enum(["true", "false"])
 		.transform((val) => val === "true")
@@ -41,7 +44,10 @@ export const buildAdminFilter = (
 	}
 
 	// Date range filters
-	const dateFilter = buildDateRangeFilter(query.createdBefore, query.createdAfter);
+	const dateFilter = buildDateRangeFilter(
+		query.createdBefore,
+		query.createdAfter,
+	);
 	if (Object.keys(dateFilter).length > 0) {
 		filters.push(dateFilter);
 	}

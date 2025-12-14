@@ -1,9 +1,13 @@
-import 'dotenv/config';
-import express, { type Application, type Request, type Response } from 'express';
-import { connectDatabase } from './config/database';
-import routes from './routes';
-import { errorHandler } from './middleware/error.middleware';
-import { sendSuccessResponse } from './utils/response.util';
+import "dotenv/config";
+import express, {
+	type Application,
+	type Request,
+	type Response,
+} from "express";
+import { connectDatabase } from "./config/database";
+import { errorHandler } from "./middleware/error.middleware";
+import routes from "./routes";
+import { sendSuccessResponse } from "./utils/response.util";
 
 /**
  * Main Application - Express server setup
@@ -16,26 +20,26 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check route
-app.get('/health', (_req: Request, res: Response) => {
-  sendSuccessResponse(res, {
-    data: {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-    },
-    message: 'LMS Backend is running'
-  });
+app.get("/health", (_req: Request, res: Response) => {
+	sendSuccessResponse(res, {
+		data: {
+			status: "healthy",
+			timestamp: new Date().toISOString(),
+		},
+		message: "LMS Backend is running",
+	});
 });
 
 // API routes
-app.use('/api/v1', routes);
+app.use("/api/v1", routes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found',
-    timestamp: new Date().toISOString(),
-  });
+	res.status(404).json({
+		success: false,
+		message: "Route not found",
+		timestamp: new Date().toISOString(),
+	});
 });
 
 // Global error handler (must be last)
@@ -43,16 +47,16 @@ app.use(errorHandler);
 
 // Start server
 const startServer = async () => {
-  try {
-    await connectDatabase();
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-      console.log(`Health check: http://localhost:${PORT}/health`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
+	try {
+		await connectDatabase();
+		app.listen(PORT, () => {
+			console.log(`Server is running on port ${PORT}`);
+			console.log(`Health check: http://localhost:${PORT}/health`);
+		});
+	} catch (error) {
+		console.error("Failed to start server:", error);
+		process.exit(1);
+	}
 };
 
 startServer();

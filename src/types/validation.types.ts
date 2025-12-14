@@ -7,8 +7,8 @@
  * Represents a single validation error field
  */
 export interface ValidationErrorField {
-  field: string;
-  message: string;
+	field: string;
+	message: string;
 }
 
 /**

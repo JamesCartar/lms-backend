@@ -1,10 +1,10 @@
-import { z } from "zod";
 import type { FilterQuery } from "mongoose";
+import { z } from "zod";
 import type { AuditLog } from "../models/auditlog.model";
 import {
 	BaseFilterQuerySchema,
-	buildSearchFilter,
 	buildDateRangeFilter,
+	buildSearchFilter,
 	mergeFilters,
 } from "../utils/filter.util";
 
@@ -16,12 +16,18 @@ import {
  * AuditLog-specific filter query schema
  */
 export const AuditLogFilterQuerySchema = BaseFilterQuerySchema.extend({
-	userId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(), // MongoDB ObjectId format
+	userId: z
+		.string()
+		.regex(/^[0-9a-fA-F]{24}$/)
+		.optional(), // MongoDB ObjectId format
 	userType: z.enum(["admin", "student"]).optional(),
 	email: z.string().email().optional(),
 	action: z.enum(["CREATE", "UPDATE", "DELETE"]).optional(),
 	resource: z.string().min(1).max(100).optional(),
-	resourceId: z.string().regex(/^[0-9a-fA-F]{24}$/).optional(),
+	resourceId: z
+		.string()
+		.regex(/^[0-9a-fA-F]{24}$/)
+		.optional(),
 });
 
 export type AuditLogFilterQuery = z.infer<typeof AuditLogFilterQuerySchema>;

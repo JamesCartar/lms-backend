@@ -1,6 +1,6 @@
-import { PermissionModel, type Permission } from "../models/permission.model";
 import type { DocumentType } from "@typegoose/typegoose";
 import type { FilterQuery } from "mongoose";
+import { type Permission, PermissionModel } from "../models/permission.model";
 
 /**
  * Permission Repository - Data access layer for Permission

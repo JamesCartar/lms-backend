@@ -1,20 +1,20 @@
-import { AuditLogRepository } from "../repositories/auditlog.repository";
+import type { FilterQuery } from "mongoose";
+import { Types } from "mongoose";
 import type { AuditLog } from "../models/auditlog.model";
+import { AuditLogRepository } from "../repositories/auditlog.repository";
 import type { AuditLogChanges } from "../types/mongodb.types";
 import { NotFoundError } from "../utils/errors.util";
-import { Types } from "mongoose";
 import { calculateSkip } from "../utils/pagination.util";
-import type { FilterQuery } from "mongoose";
 
 /**
  * AuditLog Service - Business logic layer for AuditLog
  */
 export class AuditLogService {
-  private repository: AuditLogRepository;
+	private repository: AuditLogRepository;
 
-  constructor() {
-    this.repository = new AuditLogRepository();
-  }
+	constructor() {
+		this.repository = new AuditLogRepository();
+	}
 
 	async createAuditLog(data: {
 		userId: string;
@@ -43,13 +43,13 @@ export class AuditLogService {
 		});
 	}
 
-  async getAuditLogById(id: string) {
-    const log = await this.repository.findById(id);
-    if (!log) {
-      throw new NotFoundError('Audit log not found');
-    }
-    return log;
-  }
+	async getAuditLogById(id: string) {
+		const log = await this.repository.findById(id);
+		if (!log) {
+			throw new NotFoundError("Audit log not found");
+		}
+		return log;
+	}
 
 	async getAllAuditLogs(
 		page: number,
@@ -70,35 +70,35 @@ export class AuditLogService {
 		return { logs, total };
 	}
 
-  async getAuditLogsByUserId(userId: string, page: number, limit: number) {
-    const skip = calculateSkip(page, limit);
-    const logs = await this.repository.findByUserId(userId, skip, limit);
-    const total = await this.repository.countByUserId(userId);
-    return { logs, total };
-  }
+	async getAuditLogsByUserId(userId: string, page: number, limit: number) {
+		const skip = calculateSkip(page, limit);
+		const logs = await this.repository.findByUserId(userId, skip, limit);
+		const total = await this.repository.countByUserId(userId);
+		return { logs, total };
+	}
 
-  async getAuditLogsByResource(resource: string, page: number, limit: number) {
-    const skip = calculateSkip(page, limit);
-    const logs = await this.repository.findByResource(resource, skip, limit);
-    const total = await this.repository.countByResource(resource);
-    return { logs, total };
-  }
+	async getAuditLogsByResource(resource: string, page: number, limit: number) {
+		const skip = calculateSkip(page, limit);
+		const logs = await this.repository.findByResource(resource, skip, limit);
+		const total = await this.repository.countByResource(resource);
+		return { logs, total };
+	}
 
-  async clearAllAuditLogs() {
-    const count = await this.repository.deleteAll();
-    return { deletedCount: count };
-  }
+	async clearAllAuditLogs() {
+		const count = await this.repository.deleteAll();
+		return { deletedCount: count };
+	}
 
-  async clearAuditLogsByUserId(userId: string) {
-    const count = await this.repository.deleteByUserId(userId);
-    return { deletedCount: count };
-  }
+	async clearAuditLogsByUserId(userId: string) {
+		const count = await this.repository.deleteByUserId(userId);
+		return { deletedCount: count };
+	}
 
-  async deleteAuditLogById(id: string) {
-    const log = await this.repository.deleteById(id);
-    if (!log) {
-      throw new NotFoundError('Audit log not found');
-    }
-    return log;
-  }
+	async deleteAuditLogById(id: string) {
+		const log = await this.repository.deleteById(id);
+		if (!log) {
+			throw new NotFoundError("Audit log not found");
+		}
+		return log;
+	}
 }

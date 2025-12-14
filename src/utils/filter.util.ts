@@ -1,5 +1,5 @@
-import { z } from "zod";
 import type { FilterQuery } from "mongoose";
+import { z } from "zod";
 import type { DateRangeOperator } from "../types/mongodb.types";
 
 /**
@@ -10,9 +10,9 @@ import type { DateRangeOperator } from "../types/mongodb.types";
  * Common filter options interface
  */
 export interface CommonFilterOptions {
-  search?: string;
-  createdBefore?: Date;
-  createdAfter?: Date;
+	search?: string;
+	createdBefore?: Date;
+	createdAfter?: Date;
 }
 
 /**

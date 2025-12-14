@@ -1,7 +1,7 @@
-import { UserLogModel, type UserLog } from "../models/userlog.model";
 import type { DocumentType } from "@typegoose/typegoose";
 import type { FilterQuery } from "mongoose";
 import { Types } from "mongoose";
+import { type UserLog, UserLogModel } from "../models/userlog.model";
 
 /**
  * UserLog Repository - Data access layer for UserLog

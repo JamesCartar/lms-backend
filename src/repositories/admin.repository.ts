@@ -1,6 +1,6 @@
-import { AdminModel, type Admin } from "../models/admin.model";
 import type { DocumentType } from "@typegoose/typegoose";
 import type { FilterQuery } from "mongoose";
+import { type Admin, AdminModel } from "../models/admin.model";
 
 /**
  * Admin Repository - Data access layer for Admin
@@ -53,10 +53,12 @@ export class AdminRepository {
 		id: string,
 		data: Partial<Admin>,
 	): Promise<DocumentType<Admin> | null> {
-		return await AdminModel.findByIdAndUpdate(id, data, { new: true }).populate({
-			path: "role",
-			select: "name description type",
-		});
+		return await AdminModel.findByIdAndUpdate(id, data, { new: true }).populate(
+			{
+				path: "role",
+				select: "name description type",
+			},
+		);
 	}
 
 	async delete(id: string): Promise<DocumentType<Admin> | null> {

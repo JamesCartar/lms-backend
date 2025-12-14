@@ -1,39 +1,39 @@
-import { PermissionRepository } from "../repositories/permission.repository";
+import type { FilterQuery } from "mongoose";
 import type {
+	Permission,
 	PermissionCreateInput,
 	PermissionUpdateInput,
 } from "../models/permission.model";
-import type { Permission } from "../models/permission.model";
-import { NotFoundError, ConflictError } from "../utils/errors.util";
+import { PermissionRepository } from "../repositories/permission.repository";
+import { ConflictError, NotFoundError } from "../utils/errors.util";
 import { calculateSkip } from "../utils/pagination.util";
-import type { FilterQuery } from "mongoose";
 
 /**
  * Permission Service - Business logic layer for Permission
  */
 export class PermissionService {
-  private repository: PermissionRepository;
+	private repository: PermissionRepository;
 
-  constructor() {
-    this.repository = new PermissionRepository();
-  }
+	constructor() {
+		this.repository = new PermissionRepository();
+	}
 
-  async createPermission(data: PermissionCreateInput) {
-    // PermissionCreateSchema validation ensures required fields are present
-    const existing = await this.repository.findByName(data.name!);
-    if (existing) {
-      throw new ConflictError('Permission with this name already exists');
-    }
-    return await this.repository.create(data);
-  }
+	async createPermission(data: PermissionCreateInput) {
+		// PermissionCreateSchema validation ensures required fields are present
+		const existing = await this.repository.findByName(data.name!);
+		if (existing) {
+			throw new ConflictError("Permission with this name already exists");
+		}
+		return await this.repository.create(data);
+	}
 
-  async getPermissionById(id: string) {
-    const permission = await this.repository.findById(id);
-    if (!permission) {
-      throw new NotFoundError('Permission not found');
-    }
-    return permission;
-  }
+	async getPermissionById(id: string) {
+		const permission = await this.repository.findById(id);
+		if (!permission) {
+			throw new NotFoundError("Permission not found");
+		}
+		return permission;
+	}
 
 	async getAllPermissions(
 		page = 1,
@@ -54,25 +54,25 @@ export class PermissionService {
 		return { permissions, total };
 	}
 
-  async updatePermission(id: string, data: PermissionUpdateInput) {
-    if (data.name) {
-      const existing = await this.repository.findByName(data.name);
-      if (existing && existing._id.toString() !== id) {
-        throw new ConflictError('Permission with this name already exists');
-      }
-    }
-    const permission = await this.repository.update(id, data);
-    if (!permission) {
-      throw new NotFoundError('Permission not found');
-    }
-    return permission;
-  }
+	async updatePermission(id: string, data: PermissionUpdateInput) {
+		if (data.name) {
+			const existing = await this.repository.findByName(data.name);
+			if (existing && existing._id.toString() !== id) {
+				throw new ConflictError("Permission with this name already exists");
+			}
+		}
+		const permission = await this.repository.update(id, data);
+		if (!permission) {
+			throw new NotFoundError("Permission not found");
+		}
+		return permission;
+	}
 
-  async deletePermission(id: string) {
-    const permission = await this.repository.delete(id);
-    if (!permission) {
-      throw new NotFoundError('Permission not found');
-    }
-    return permission;
-  }
+	async deletePermission(id: string) {
+		const permission = await this.repository.delete(id);
+		if (!permission) {
+			throw new NotFoundError("Permission not found");
+		}
+		return permission;
+	}
 }

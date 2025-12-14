@@ -1,64 +1,104 @@
-import type { Request, Response } from 'express';
-import { AuditLogService } from '../services/auditlog.service';
-import { sendSuccessResponse } from '../utils/response.util';
-import { asyncHandler } from '../middleware/error.middleware';
-import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
-import { getIdParam, getRequiredParam } from '../utils/params.util';
-import { buildAuditLogFilter } from '../filters/auditlog.filter';
+import type { Request, Response } from "express";
+import { buildAuditLogFilter } from "../filters/auditlog.filter";
+import { asyncHandler } from "../middleware/error.middleware";
+import { AuditLogService } from "../services/auditlog.service";
+import {
+	calculatePaginationMeta,
+	getPaginationParams,
+} from "../utils/pagination.util";
+import { getIdParam, getRequiredParam } from "../utils/params.util";
+import { sendSuccessResponse } from "../utils/response.util";
 
 /**
  * AuditLog Controller - Handles HTTP requests for AuditLog
  */
 export class AuditLogController {
-  private service: AuditLogService;
+	private service: AuditLogService;
 
-  constructor() {
-    this.service = new AuditLogService();
-  }
+	constructor() {
+		this.service = new AuditLogService();
+	}
 
-  getAll = asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit, sortBy, sortOrder } = getPaginationParams(req);
-    
-    // Get validated filter query from middleware
-    const filterQuery = req.validatedQuery || {};
-    const filter = buildAuditLogFilter(filterQuery);
-    
-    const { logs, total } = await this.service.getAllAuditLogs(page, limit, sortBy, sortOrder, filter);
-    const pagination = calculatePaginationMeta(page, limit, total);
-    sendSuccessResponse(res, { data: logs, message: 'Audit logs retrieved successfully', pagination });
-  });
+	getAll = asyncHandler(async (req: Request, res: Response) => {
+		const { page, limit, sortBy, sortOrder } = getPaginationParams(req);
 
-  getById = asyncHandler(async (req: Request, res: Response) => {
-    const log = await this.service.getAuditLogById(getIdParam(req));
-    sendSuccessResponse(res, { data: log });
-  });
+		// Get validated filter query from middleware
+		const filterQuery = req.validatedQuery || {};
+		const filter = buildAuditLogFilter(filterQuery);
 
-  getByUserId = asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit } = getPaginationParams(req);
-    const { logs, total } = await this.service.getAuditLogsByUserId(getRequiredParam(req, "userId"), page, limit);
-    const pagination = calculatePaginationMeta(page, limit, total);
-    sendSuccessResponse(res, { data: logs, message: 'Audit logs retrieved successfully', pagination });
-  });
+		const { logs, total } = await this.service.getAllAuditLogs(
+			page,
+			limit,
+			sortBy,
+			sortOrder,
+			filter,
+		);
+		const pagination = calculatePaginationMeta(page, limit, total);
+		sendSuccessResponse(res, {
+			data: logs,
+			message: "Audit logs retrieved successfully",
+			pagination,
+		});
+	});
 
-  getByResource = asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit } = getPaginationParams(req);
-    const { logs, total } = await this.service.getAuditLogsByResource(getRequiredParam(req, "resource"), page, limit);
-    const pagination = calculatePaginationMeta(page, limit, total);
-    sendSuccessResponse(res, { data: logs, message: 'Audit logs retrieved successfully', pagination });
-  });
+	getById = asyncHandler(async (req: Request, res: Response) => {
+		const log = await this.service.getAuditLogById(getIdParam(req));
+		sendSuccessResponse(res, { data: log });
+	});
 
-  clearAll = asyncHandler(async (_req: Request, res: Response) => {
-    const result = await this.service.clearAllAuditLogs();
-    sendSuccessResponse(res, { data: result, message: 'All audit logs cleared successfully' });
-  });
+	getByUserId = asyncHandler(async (req: Request, res: Response) => {
+		const { page, limit } = getPaginationParams(req);
+		const { logs, total } = await this.service.getAuditLogsByUserId(
+			getRequiredParam(req, "userId"),
+			page,
+			limit,
+		);
+		const pagination = calculatePaginationMeta(page, limit, total);
+		sendSuccessResponse(res, {
+			data: logs,
+			message: "Audit logs retrieved successfully",
+			pagination,
+		});
+	});
 
-  clearByUserId = asyncHandler(async (req: Request, res: Response) => {
-    const result = await this.service.clearAuditLogsByUserId(getRequiredParam(req, "userId"));
-    sendSuccessResponse(res, { data: result, message: 'Audit logs cleared successfully' });
-  });
+	getByResource = asyncHandler(async (req: Request, res: Response) => {
+		const { page, limit } = getPaginationParams(req);
+		const { logs, total } = await this.service.getAuditLogsByResource(
+			getRequiredParam(req, "resource"),
+			page,
+			limit,
+		);
+		const pagination = calculatePaginationMeta(page, limit, total);
+		sendSuccessResponse(res, {
+			data: logs,
+			message: "Audit logs retrieved successfully",
+			pagination,
+		});
+	});
 
-  deleteById = asyncHandler(async (req: Request, res: Response) => {
-    await this.service.deleteAuditLogById(getIdParam(req));
-    sendSuccessResponse(res, { data: null, message: 'Audit log deleted successfully' });
-  });
+	clearAll = asyncHandler(async (_req: Request, res: Response) => {
+		const result = await this.service.clearAllAuditLogs();
+		sendSuccessResponse(res, {
+			data: result,
+			message: "All audit logs cleared successfully",
+		});
+	});
+
+	clearByUserId = asyncHandler(async (req: Request, res: Response) => {
+		const result = await this.service.clearAuditLogsByUserId(
+			getRequiredParam(req, "userId"),
+		);
+		sendSuccessResponse(res, {
+			data: result,
+			message: "Audit logs cleared successfully",
+		});
+	});
+
+	deleteById = asyncHandler(async (req: Request, res: Response) => {
+		await this.service.deleteAuditLogById(getIdParam(req));
+		sendSuccessResponse(res, {
+			data: null,
+			message: "Audit log deleted successfully",
+		});
+	});
 }

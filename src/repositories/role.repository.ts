@@ -1,6 +1,6 @@
-import { RoleModel, type Role } from "../models/role.model";
 import type { DocumentType } from "@typegoose/typegoose";
 import type { FilterQuery } from "mongoose";
+import { type Role, RoleModel } from "../models/role.model";
 
 /**
  * Role Repository - Data access layer for Role
@@ -50,12 +50,23 @@ export class RoleRepository {
 			.limit(limit);
 	}
 
-	async findByIdLight(id: string): Promise<DocumentType<Role> | null> {
-		return await RoleModel.findById(id).select("_id type");
+	async findByIdLight(
+		id: string,
+	): Promise<{ _id: unknown; type?: string } | null> {
+		return (await RoleModel.findById(id).select("_id type").lean()) as {
+			_id: unknown;
+			type?: string;
+		} | null;
 	}
 
-	async findAllNames(): Promise<DocumentType<Role>[]> {
-		return await RoleModel.find().select("_id name").sort({ name: 1 });
+	async findAllNames(): Promise<{ _id: unknown; name: string }[]> {
+		return (await RoleModel.find()
+			.select("_id name")
+			.sort({ name: 1 })
+			.lean()) as {
+			_id: unknown;
+			name: string;
+		}[];
 	}
 
 	async count(filter: FilterQuery<Role> = {}): Promise<number> {
