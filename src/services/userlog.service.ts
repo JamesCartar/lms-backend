@@ -1,6 +1,5 @@
 import { UserLogRepository } from '../repositories/userlog.repository';
 import { NotFoundError } from '../utils/errors.util';
-import { UserLog } from '../models/userlog.model';
 import { Types } from 'mongoose';
 import { calculateSkip } from '../utils/pagination.util';
 

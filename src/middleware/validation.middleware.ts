@@ -6,7 +6,7 @@ import { ValidationError } from '../utils/errors.util';
  * Validation middleware for request validation using Zod schemas
  */
 export const validate = (schema: z.ZodSchema) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, _res: Response, next: NextFunction) => {
     try {
       await schema.parseAsync(req.body);
       next();

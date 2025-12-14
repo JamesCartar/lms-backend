@@ -9,9 +9,9 @@ import { sendErrorResponse } from '../utils/response.util';
  */
 export const errorHandler = (
   error: Error | AppError | ZodError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): Response => {
   // Log error for debugging
   console.error('Error:', error);

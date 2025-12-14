@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check route
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
   sendSuccessResponse(res, {
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -27,7 +27,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/api/v1', routes);
 
 // 404 handler
-app.use((req: Request, res: Response) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: 'Route not found',

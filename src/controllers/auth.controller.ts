@@ -3,8 +3,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { AdminModel } from '../models/admin.model';
 import { StudentModel } from '../models/student.model';
-import { RoleModel } from '../models/role.model';
-import { PermissionModel } from '../models/permission.model';
 import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
 import { UnauthorizedError, BadRequestError } from '../utils/errors.util';

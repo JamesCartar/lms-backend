@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { DocumentType } from '@typegoose/typegoose';
 import { PermissionModel, Permission } from '../models/permission.model';
