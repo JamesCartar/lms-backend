@@ -1,6 +1,7 @@
 import { PermissionRepository } from '../repositories/permission.repository';
 import { PermissionCreateInput, PermissionUpdateInput } from '../models/permission.model';
 import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
+import { calculateSkip } from '../utils/pagination.util';
 
 /**
  * Permission Service - Business logic layer for Permission
@@ -33,8 +34,16 @@ export class PermissionService {
     return permission;
   }
 
-  async getAllPermissions() {
-    return await this.repository.findAll();
+  async getAllPermissions(
+    page: number = 1,
+    limit: number = 10,
+    sortBy?: string,
+    sortOrder?: 'asc' | 'desc'
+  ) {
+    const skip = calculateSkip(page, limit);
+    const permissions = await this.repository.findAll(skip, limit, sortBy, sortOrder);
+    const total = await this.repository.count();
+    return { permissions, total };
   }
 
   async updatePermission(id: string, data: PermissionUpdateInput) {

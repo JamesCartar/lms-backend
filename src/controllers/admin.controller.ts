@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AdminService } from '../services/admin.service';
 import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
+import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 
 /**
  * Admin Controller - Handles HTTP requests for Admin
@@ -24,8 +25,10 @@ export class AdminController {
   });
 
   getAll = asyncHandler(async (req: Request, res: Response) => {
-    const admins = await this.service.getAllAdmins();
-    sendSuccessResponse(res, admins);
+    const { page, limit, sortBy, sortOrder } = getPaginationParams(req);
+    const { admins, total } = await this.service.getAllAdmins(page, limit, sortBy, sortOrder);
+    const pagination = calculatePaginationMeta(page, limit, total);
+    sendSuccessResponse(res, admins, 'Admins retrieved successfully', 200, pagination);
   });
 
   update = asyncHandler(async (req: Request, res: Response) => {

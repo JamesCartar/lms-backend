@@ -17,8 +17,25 @@ export class RoleRepository {
     return await RoleModel.findOne({ name }).populate('permissions');
   }
 
-  async findAll(): Promise<DocumentType<Role>[]> {
-    return await RoleModel.find().populate('permissions');
+  async findAll(
+    skip: number,
+    limit: number,
+    sortBy: string = 'createdAt',
+    sortOrder: 'asc' | 'desc' = 'desc'
+  ): Promise<DocumentType<Role>[]> {
+    const sortObj: Record<string, 1 | -1> = {
+      [sortBy]: sortOrder === 'asc' ? 1 : -1,
+    };
+    
+    return await RoleModel.find()
+      .populate('permissions')
+      .sort(sortObj)
+      .skip(skip)
+      .limit(limit);
+  }
+
+  async count(): Promise<number> {
+    return await RoleModel.countDocuments();
   }
 
   async update(id: string, data: Partial<Role>): Promise<DocumentType<Role> | null> {

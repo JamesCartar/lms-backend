@@ -8,11 +8,18 @@ import { PermissionModel } from '../models/permission.model';
 import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
 import { UnauthorizedError, BadRequestError } from '../utils/errors.util';
+import { UserLogService } from '../services/userlog.service';
 
 /**
  * Auth Controller - Handles authentication and login
  */
 export class AuthController {
+  private userLogService: UserLogService;
+
+  constructor() {
+    this.userLogService = new UserLogService();
+  }
+
   /**
    * Admin login
    */
@@ -75,6 +82,18 @@ export class AuthController {
       { expiresIn: '24h' }
     );
 
+    // Log the login
+    this.userLogService.createUserLog({
+      userId: admin._id.toString(),
+      userType: 'admin',
+      email: admin.email,
+      ip: req.ip || req.socket.remoteAddress,
+      userAgent: req.get('user-agent'),
+    }).catch((error) => {
+      // Don't fail login if logging fails
+      console.error('Failed to create user log:', error);
+    });
+
     sendSuccessResponse(
       res,
       {
@@ -135,6 +154,18 @@ export class AuthController {
       jwtSecret,
       { expiresIn: '24h' }
     );
+
+    // Log the login
+    this.userLogService.createUserLog({
+      userId: student._id.toString(),
+      userType: 'student',
+      email: student.email,
+      ip: req.ip || req.socket.remoteAddress,
+      userAgent: req.get('user-agent'),
+    }).catch((error) => {
+      // Don't fail login if logging fails
+      console.error('Failed to create user log:', error);
+    });
 
     sendSuccessResponse(
       res,

@@ -4,6 +4,8 @@ import permissionRoutes from './permission.routes';
 import roleRoutes from './role.routes';
 import adminRoutes from './admin.routes';
 import studentRoutes from './student.routes';
+import userlogRoutes from './userlog.routes';
+import auditlogRoutes from './auditlog.routes';
 
 /**
  * Main Router - Combines all routes
@@ -15,5 +17,7 @@ router.use('/permissions', permissionRoutes);
 router.use('/roles', roleRoutes);
 router.use('/admins', adminRoutes);
 router.use('/students', studentRoutes);
+router.use('/userlogs', userlogRoutes);
+router.use('/auditlogs', auditlogRoutes);
 
 export default router;

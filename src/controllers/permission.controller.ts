@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { PermissionService } from '../services/permission.service';
 import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
+import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 
 /**
  * Permission Controller - Handles HTTP requests for Permission
@@ -24,8 +25,10 @@ export class PermissionController {
   });
 
   getAll = asyncHandler(async (req: Request, res: Response) => {
-    const permissions = await this.service.getAllPermissions();
-    sendSuccessResponse(res, permissions);
+    const { page, limit, sortBy, sortOrder } = getPaginationParams(req);
+    const { permissions, total } = await this.service.getAllPermissions(page, limit, sortBy, sortOrder);
+    const pagination = calculatePaginationMeta(page, limit, total);
+    sendSuccessResponse(res, permissions, 'Permissions retrieved successfully', 200, pagination);
   });
 
   update = asyncHandler(async (req: Request, res: Response) => {

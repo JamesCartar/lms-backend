@@ -17,8 +17,25 @@ export class AdminRepository {
     return await AdminModel.findOne({ email }).populate('role');
   }
 
-  async findAll(): Promise<DocumentType<Admin>[]> {
-    return await AdminModel.find().populate('role');
+  async findAll(
+    skip: number,
+    limit: number,
+    sortBy: string = 'createdAt',
+    sortOrder: 'asc' | 'desc' = 'desc'
+  ): Promise<DocumentType<Admin>[]> {
+    const sortObj: Record<string, 1 | -1> = {
+      [sortBy]: sortOrder === 'asc' ? 1 : -1,
+    };
+    
+    return await AdminModel.find()
+      .populate('role')
+      .sort(sortObj)
+      .skip(skip)
+      .limit(limit);
+  }
+
+  async count(): Promise<number> {
+    return await AdminModel.countDocuments();
   }
 
   async update(id: string, data: Partial<Admin>): Promise<DocumentType<Admin> | null> {

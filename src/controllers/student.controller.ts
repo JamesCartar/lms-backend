@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { StudentService } from '../services/student.service';
 import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
+import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 
 /**
  * Student Controller - Handles HTTP requests for Student
@@ -24,8 +25,10 @@ export class StudentController {
   });
 
   getAll = asyncHandler(async (req: Request, res: Response) => {
-    const students = await this.service.getAllStudents();
-    sendSuccessResponse(res, students);
+    const { page, limit, sortBy, sortOrder } = getPaginationParams(req);
+    const { students, total } = await this.service.getAllStudents(page, limit, sortBy, sortOrder);
+    const pagination = calculatePaginationMeta(page, limit, total);
+    sendSuccessResponse(res, students, 'Students retrieved successfully', 200, pagination);
   });
 
   getByEnrollmentYear = asyncHandler(async (req: Request, res: Response) => {
