@@ -23,7 +23,7 @@ export class AuthController {
    * Admin login
    */
   loginAdmin = asyncHandler(async (req: Request, res: Response) => {
-    // Zod validation ensures email and password are present
+    // AdminLoginSchema validation ensures email and password are present
     const { email, password } = req.body;
 
     // Find admin by email
@@ -110,7 +110,7 @@ export class AuthController {
    * Student login
    */
   loginStudent = asyncHandler(async (req: Request, res: Response) => {
-    // Zod validation ensures email and password are present
+    // StudentLoginSchema validation ensures email and password are present
     const { email, password } = req.body;
 
     // Find student by email

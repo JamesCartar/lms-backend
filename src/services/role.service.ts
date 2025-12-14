@@ -19,7 +19,7 @@ export class RoleService {
   }
 
   async createRole(data: RoleCreateInput) {
-    // Zod validation ensures required fields are present
+    // RoleCreateSchema validation ensures required fields are present
     const existing = await this.repository.findByName(data.name!);
     if (existing) {
       throw new ConflictError('Role with this name already exists');

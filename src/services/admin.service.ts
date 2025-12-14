@@ -19,7 +19,7 @@ export class AdminService {
   }
 
   async createAdmin(data: AdminCreateInput) {
-    // Zod validation ensures required fields are present
+    // AdminCreateSchema validation ensures required fields are present
     const existing = await this.repository.findByEmail(data.email!);
     if (existing) {
       throw new ConflictError('Admin with this email already exists');

@@ -14,7 +14,7 @@ export class StudentService {
   }
 
   async createStudent(data: StudentCreateInput) {
-    // Zod validation ensures required fields are present
+    // StudentCreateSchema validation ensures required fields are present
     const existing = await this.repository.findByEmail(data.email!);
     if (existing) {
       throw new ConflictError('Student with this email already exists');
