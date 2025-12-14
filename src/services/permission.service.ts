@@ -1,6 +1,6 @@
 import { PermissionRepository } from '../repositories/permission.repository';
 import { PermissionCreateInput, PermissionUpdateInput } from '../models/permission.model';
-import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
+import { NotFoundError, ConflictError } from '../utils/errors.util';
 import { calculateSkip } from '../utils/pagination.util';
 
 /**
@@ -14,12 +14,8 @@ export class PermissionService {
   }
 
   async createPermission(data: PermissionCreateInput) {
-    // Validation ensures name exists, but TypeScript doesn't know that
-    if (!data.name || !data.resource || !data.action) {
-      throw new BadRequestError('Name, resource, and action are required');
-    }
-    
-    const existing = await this.repository.findByName(data.name);
+    // Zod validation ensures required fields are present
+    const existing = await this.repository.findByName(data.name!);
     if (existing) {
       throw new ConflictError('Permission with this name already exists');
     }

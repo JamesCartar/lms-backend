@@ -1,6 +1,6 @@
 import { StudentRepository } from '../repositories/student.repository';
 import { StudentCreateInput, StudentUpdateInput } from '../models/student.model';
-import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
+import { NotFoundError, ConflictError } from '../utils/errors.util';
 import { calculateSkip } from '../utils/pagination.util';
 
 /**
@@ -14,12 +14,8 @@ export class StudentService {
   }
 
   async createStudent(data: StudentCreateInput) {
-    // Validation ensures required fields exist, but TypeScript doesn't know that
-    if (!data.email || !data.firstName || !data.lastName || !data.password) {
-      throw new BadRequestError('Email, firstName, lastName, and password are required');
-    }
-    
-    const existing = await this.repository.findByEmail(data.email);
+    // Zod validation ensures required fields are present
+    const existing = await this.repository.findByEmail(data.email!);
     if (existing) {
       throw new ConflictError('Student with this email already exists');
     }

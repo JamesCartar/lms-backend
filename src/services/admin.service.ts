@@ -1,7 +1,7 @@
 import { AdminRepository } from '../repositories/admin.repository';
 import { RoleRepository } from '../repositories/role.repository';
 import { AdminCreateInput, AdminUpdateInput } from '../models/admin.model';
-import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
+import { NotFoundError, ConflictError } from '../utils/errors.util';
 import { calculateSkip } from '../utils/pagination.util';
 import { Ref } from '@typegoose/typegoose';
 import { Role } from '../models/role.model';
@@ -19,12 +19,8 @@ export class AdminService {
   }
 
   async createAdmin(data: AdminCreateInput) {
-    // Validation ensures required fields exist, but TypeScript doesn't know that
-    if (!data.email || !data.name || !data.password) {
-      throw new BadRequestError('Email, name, and password are required');
-    }
-    
-    const existing = await this.repository.findByEmail(data.email);
+    // Zod validation ensures required fields are present
+    const existing = await this.repository.findByEmail(data.email!);
     if (existing) {
       throw new ConflictError('Admin with this email already exists');
     }
@@ -39,9 +35,9 @@ export class AdminService {
 
     // In production, password should be hashed here
     return await this.repository.create({
-      name: data.name,
-      email: data.email,
-      password: data.password,
+      name: data.name!,
+      email: data.email!,
+      password: data.password!,
       // Zod validates as string (ObjectId), which is valid for Mongoose references
       role: data.role as Ref<Role> | undefined,
       isActive: data.isActive,
