@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { PaginationMeta } from './pagination.util';
 
 /**
  * Standard Response Format Interface
@@ -7,6 +8,7 @@ export interface ApiResponse<T = any> {
   success: boolean;
   message?: string;
   data?: T;
+  pagination?: PaginationMeta;
   errors?: any[];
   timestamp: string;
 }
@@ -18,7 +20,8 @@ export const sendSuccessResponse = <T = any>(
   res: Response,
   data: T,
   message?: string,
-  statusCode: number = 200
+  statusCode: number = 200,
+  pagination?: PaginationMeta
 ): Response => {
   const response: ApiResponse<T> = {
     success: true,
@@ -26,6 +29,10 @@ export const sendSuccessResponse = <T = any>(
     data,
     timestamp: new Date().toISOString(),
   };
+
+  if (pagination) {
+    response.pagination = pagination;
+  }
 
   return res.status(statusCode).json(response);
 };

@@ -53,8 +53,15 @@ export class AdminService {
     return admin;
   }
 
-  async getAllAdmins() {
-    return await this.repository.findAll();
+  async getAllAdmins(
+    page: number = 1,
+    limit: number = 10,
+    sortBy?: string,
+    sortOrder?: 'asc' | 'desc'
+  ) {
+    const admins = await this.repository.findAll(page, limit, sortBy, sortOrder);
+    const total = await this.repository.count();
+    return { admins, total };
   }
 
   async updateAdmin(id: string, data: AdminUpdateInput) {

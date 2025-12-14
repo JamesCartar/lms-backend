@@ -50,8 +50,15 @@ export class RoleService {
     return role;
   }
 
-  async getAllRoles() {
-    return await this.repository.findAll();
+  async getAllRoles(
+    page: number = 1,
+    limit: number = 10,
+    sortBy?: string,
+    sortOrder?: 'asc' | 'desc'
+  ) {
+    const roles = await this.repository.findAll(page, limit, sortBy, sortOrder);
+    const total = await this.repository.count();
+    return { roles, total };
   }
 
   async updateRole(id: string, data: RoleUpdateInput) {

@@ -4,6 +4,7 @@ import { validate } from '../middleware/validation.middleware';
 import { AdminCreateSchema, AdminUpdateSchema } from '../models/admin.model';
 import { authenticate } from '../middleware/auth.middleware';
 import { checkPermission, isAdmin } from '../middleware/permission.middleware';
+import { saveHistory } from '../middleware/history.middleware';
 
 /**
  * Admin Routes - Defines API endpoints for Admin
@@ -16,10 +17,10 @@ const controller = new AdminController();
 router.use(authenticate);
 router.use(isAdmin); // Ensure only admin type users can access
 
-router.post('/', checkPermission('admin.create'), validate(AdminCreateSchema), controller.create);
+router.post('/', checkPermission('admin.create'), validate(AdminCreateSchema), saveHistory('admin'), controller.create);
 router.get('/', checkPermission('admin.read'), controller.getAll);
 router.get('/:id', checkPermission('admin.read'), controller.getById);
-router.put('/:id', checkPermission('admin.update'), validate(AdminUpdateSchema), controller.update);
-router.delete('/:id', checkPermission('admin.delete'), controller.delete);
+router.put('/:id', checkPermission('admin.update'), validate(AdminUpdateSchema), saveHistory('admin'), controller.update);
+router.delete('/:id', checkPermission('admin.delete'), saveHistory('admin'), controller.delete);
 
 export default router;

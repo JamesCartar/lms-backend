@@ -17,8 +17,25 @@ export class PermissionRepository {
     return await PermissionModel.findOne({ name });
   }
 
-  async findAll(): Promise<DocumentType<Permission>[]> {
-    return await PermissionModel.find();
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    sortBy: string = 'createdAt',
+    sortOrder: 'asc' | 'desc' = 'desc'
+  ): Promise<DocumentType<Permission>[]> {
+    const skip = (page - 1) * limit;
+    const sortObj: Record<string, 1 | -1> = {
+      [sortBy]: sortOrder === 'asc' ? 1 : -1,
+    };
+    
+    return await PermissionModel.find()
+      .sort(sortObj)
+      .skip(skip)
+      .limit(limit);
+  }
+
+  async count(): Promise<number> {
+    return await PermissionModel.countDocuments();
   }
 
   async update(id: string, data: Partial<Permission>): Promise<DocumentType<Permission> | null> {

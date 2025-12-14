@@ -35,8 +35,15 @@ export class StudentService {
     return student;
   }
 
-  async getAllStudents() {
-    return await this.repository.findAll();
+  async getAllStudents(
+    page: number = 1,
+    limit: number = 10,
+    sortBy?: string,
+    sortOrder?: 'asc' | 'desc'
+  ) {
+    const students = await this.repository.findAll(page, limit, sortBy, sortOrder);
+    const total = await this.repository.count();
+    return { students, total };
   }
 
   async getStudentsByEnrollmentYear(year: number) {

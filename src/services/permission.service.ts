@@ -33,8 +33,15 @@ export class PermissionService {
     return permission;
   }
 
-  async getAllPermissions() {
-    return await this.repository.findAll();
+  async getAllPermissions(
+    page: number = 1,
+    limit: number = 10,
+    sortBy?: string,
+    sortOrder?: 'asc' | 'desc'
+  ) {
+    const permissions = await this.repository.findAll(page, limit, sortBy, sortOrder);
+    const total = await this.repository.count();
+    return { permissions, total };
   }
 
   async updatePermission(id: string, data: PermissionUpdateInput) {
