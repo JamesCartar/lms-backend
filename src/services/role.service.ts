@@ -36,6 +36,7 @@ export class RoleService {
     return await this.repository.create({
       name: data.name,
       description: data.description,
+      type: data.type,
       // Zod validates as string[] (ObjectIds), which is valid for Mongoose references
       permissions: data.permissions as Ref<Permission>[] | undefined,
     });
@@ -86,6 +87,7 @@ export class RoleService {
     const role = await this.repository.update(id, {
       name: data.name,
       description: data.description,
+      type: data.type,
       // Zod validates as string[] (ObjectIds), which is valid for Mongoose references
       permissions: data.permissions as Ref<Permission>[] | undefined,
     });
