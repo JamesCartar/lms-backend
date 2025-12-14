@@ -19,12 +19,12 @@ export class StudentController {
 
   create = asyncHandler(async (req: Request, res: Response) => {
     const student = await this.service.createStudent(req.body);
-    sendSuccessResponse(res, student, 'Student created successfully', 201);
+    sendSuccessResponse(res, { data: student, message: 'Student created successfully', statusCode: 201 });
   });
 
   getById = asyncHandler(async (req: Request, res: Response) => {
     const student = await this.service.getStudentById(getIdParam(req));
-    sendSuccessResponse(res, student);
+    sendSuccessResponse(res, { data: student });
   });
 
   getAll = asyncHandler(async (req: Request, res: Response) => {
@@ -36,7 +36,7 @@ export class StudentController {
     
     const { students, total } = await this.service.getAllStudents(page, limit, sortBy, sortOrder, filter);
     const pagination = calculatePaginationMeta(page, limit, total);
-    sendSuccessResponse(res, students, 'Students retrieved successfully', 200, pagination);
+    sendSuccessResponse(res, { data: students, message: 'Students retrieved successfully', pagination });
   });
 
   getByEnrollmentYear = asyncHandler(async (req: Request, res: Response) => {
@@ -46,16 +46,16 @@ export class StudentController {
       throw new BadRequestError('Invalid year parameter');
     }
     const students = await this.service.getStudentsByEnrollmentYear(year);
-    sendSuccessResponse(res, students);
+    sendSuccessResponse(res, { data: students });
   });
 
   update = asyncHandler(async (req: Request, res: Response) => {
     const student = await this.service.updateStudent(getIdParam(req), req.body);
-    sendSuccessResponse(res, student, 'Student updated successfully');
+    sendSuccessResponse(res, { data: student, message: 'Student updated successfully' });
   });
 
   delete = asyncHandler(async (req: Request, res: Response) => {
     await this.service.deleteStudent(getIdParam(req));
-    sendSuccessResponse(res, null, 'Student deleted successfully');
+    sendSuccessResponse(res, { data: null, message: 'Student deleted successfully' });
   });
 }

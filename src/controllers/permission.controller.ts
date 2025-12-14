@@ -18,12 +18,12 @@ export class PermissionController {
 
   create = asyncHandler(async (req: Request, res: Response) => {
     const permission = await this.service.createPermission(req.body);
-    sendSuccessResponse(res, permission, 'Permission created successfully', 201);
+    sendSuccessResponse(res, { data: permission, message: 'Permission created successfully', statusCode: 201 });
   });
 
   getById = asyncHandler(async (req: Request, res: Response) => {
     const permission = await this.service.getPermissionById(getIdParam(req));
-    sendSuccessResponse(res, permission);
+    sendSuccessResponse(res, { data: permission });
   });
 
   getAll = asyncHandler(async (req: Request, res: Response) => {
@@ -35,16 +35,16 @@ export class PermissionController {
     
     const { permissions, total } = await this.service.getAllPermissions(page, limit, sortBy, sortOrder, filter);
     const pagination = calculatePaginationMeta(page, limit, total);
-    sendSuccessResponse(res, permissions, 'Permissions retrieved successfully', 200, pagination);
+    sendSuccessResponse(res, { data: permissions, message: 'Permissions retrieved successfully', pagination });
   });
 
   update = asyncHandler(async (req: Request, res: Response) => {
     const permission = await this.service.updatePermission(getIdParam(req), req.body);
-    sendSuccessResponse(res, permission, 'Permission updated successfully');
+    sendSuccessResponse(res, { data: permission, message: 'Permission updated successfully' });
   });
 
   delete = asyncHandler(async (req: Request, res: Response) => {
     await this.service.deletePermission(getIdParam(req));
-    sendSuccessResponse(res, null, 'Permission deleted successfully');
+    sendSuccessResponse(res, { data: null, message: 'Permission deleted successfully' });
   });
 }

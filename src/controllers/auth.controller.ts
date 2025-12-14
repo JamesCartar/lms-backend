@@ -97,16 +97,18 @@ export class AuthController {
     sendSuccessResponse(
       res,
       {
-        token,
-        user: {
-          id: admin._id,
-          name: admin.name,
-          email: admin.email,
-          role: admin.role,
-          type: 'admin',
+        data: {
+          token,
+          user: {
+            id: admin._id,
+            name: admin.name,
+            email: admin.email,
+            role: admin.role,
+            type: 'admin',
+          },
         },
-      },
-      'Login successful'
+        message: 'Login successful'
+      }
     );
   });
 
@@ -167,16 +169,18 @@ export class AuthController {
     sendSuccessResponse(
       res,
       {
-        token,
-        user: {
-          id: student._id,
-          firstName: student.firstName,
-          lastName: student.lastName,
-          email: student.email,
-          type: 'student',
+        data: {
+          token,
+          user: {
+            id: student._id,
+            firstName: student.firstName,
+            lastName: student.lastName,
+            email: student.email,
+            type: 'student',
+          },
         },
-      },
-      'Login successful'
+        message: 'Login successful'
+      }
     );
   });
 
@@ -208,6 +212,6 @@ export class AuthController {
       throw new UnauthorizedError('User not found');
     }
 
-    sendSuccessResponse(res, { user, jwt: req.jwt });
+    sendSuccessResponse(res, { data: { user, jwt: req.jwt } });
   });
 }
