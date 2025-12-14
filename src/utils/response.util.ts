@@ -39,6 +39,33 @@ export const sendSuccessResponse = <T = unknown>(
 };
 
 /**
+ * Send success response with data wrapped in a resource key
+ */
+export const sendSuccessResponseWithResource = <T = unknown>(
+  res: Response,
+  data: T,
+  resourceKey: string,
+  message?: string,
+  statusCode: number = 200,
+  pagination?: PaginationMeta
+): Response => {
+  const wrappedData = { [resourceKey]: data } as any;
+  
+  const response: ApiResponse<typeof wrappedData> = {
+    success: true,
+    message,
+    data: wrappedData,
+    timestamp: new Date().toISOString(),
+  };
+
+  if (pagination) {
+    response.pagination = pagination;
+  }
+
+  return res.status(statusCode).json(response);
+};
+
+/**
  * Send error response with consistent format
  */
 export const sendErrorResponse = (

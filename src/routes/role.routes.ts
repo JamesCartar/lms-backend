@@ -19,6 +19,7 @@ router.use(authenticate);
 router.use(isAdmin); // Ensure only admin type users can access
 
 router.post('/', checkPermission('role.create'), validate(RoleCreateSchema), saveHistory('role'), controller.create);
+router.get('/names', checkPermission('role.read'), controller.getRoleNames);
 router.get('/', checkPermission('role.read'), validateQuery(RoleFilterQuerySchema), controller.getAll);
 router.get('/:id', checkPermission('role.read'), controller.getById);
 router.put('/:id', checkPermission('role.update'), validate(RoleUpdateSchema), saveHistory('role'), controller.update);

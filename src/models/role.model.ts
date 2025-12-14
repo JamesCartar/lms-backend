@@ -17,6 +17,9 @@ export class Role {
   @prop({ ref: () => Permission, type: () => [String] })
   public permissions?: Ref<Permission>[];
 
+  @prop({ enum: ['system', 'custom'], default: 'custom' })
+  public type?: string;
+
   @prop({ default: Date.now })
   public createdAt?: Date;
 
@@ -32,12 +35,14 @@ export const RoleCreateSchema = z.object({
   name: createStringSchema(true, 3, 50),
   description: createStringSchema(false, 0, 200),
   permissions: createArraySchema(createObjectIdSchema(), false),
+  type: z.enum(['system', 'custom']).optional(),
 });
 
 export const RoleUpdateSchema = z.object({
   name: createStringSchema(false, 3, 50),
   description: createStringSchema(false, 0, 200),
   permissions: createArraySchema(createObjectIdSchema(), false),
+  type: z.enum(['system', 'custom']).optional(),
 });
 
 // Type inference from Zod schemas
