@@ -23,44 +23,31 @@ export interface PaginatedData<T> {
 }
 
 /**
+ * Options for sendSuccessResponse
+ */
+export interface SendSuccessResponseOptions<T = unknown> {
+  data: T;
+  message?: string;
+  statusCode?: number;
+  pagination?: PaginationMeta;
+  resourceKey?: string;
+}
+
+/**
  * Send success response with consistent format
  * If pagination is provided, data is wrapped with pagination
+ * If resourceKey is provided, data is wrapped in a resource object
  */
 export const sendSuccessResponse = <T = unknown>(
   res: Response,
-  data: T,
-  message?: string,
-  statusCode: number = 200,
-  pagination?: PaginationMeta
+  options: SendSuccessResponseOptions<T>
 ): Response => {
-  const responseData = pagination 
-    ? { items: data, pagination }
-    : data;
+  const { data, message, statusCode = 200, pagination, resourceKey } = options;
 
-  const response: ApiResponse<typeof responseData> = {
-    success: true,
-    message,
-    data: responseData,
-    timestamp: new Date().toISOString(),
-  };
-
-  return res.status(statusCode).json(response);
-};
-
-/**
- * Send success response with data wrapped in a resource key
- * If pagination is provided, data is wrapped with pagination
- */
-export const sendSuccessResponseWithResource = <T = unknown>(
-  res: Response,
-  data: T,
-  resourceKey: string,
-  message?: string,
-  statusCode: number = 200,
-  pagination?: PaginationMeta
-): Response => {
-  const wrappedData: Record<string, T> = { [resourceKey]: data };
+  // Wrap data in resource key if provided
+  const wrappedData = resourceKey ? { [resourceKey]: data } : data;
   
+  // Wrap with pagination if provided
   const responseData = pagination 
     ? { items: wrappedData, pagination }
     : wrappedData;

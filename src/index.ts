@@ -18,9 +18,12 @@ app.use(express.urlencoded({ extended: true }));
 // Health check route
 app.get('/health', (_req: Request, res: Response) => {
   sendSuccessResponse(res, {
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-  }, 'LMS Backend is running');
+    data: {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+    },
+    message: 'LMS Backend is running'
+  });
 });
 
 // API routes

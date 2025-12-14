@@ -18,12 +18,12 @@ export class AdminController {
 
   create = asyncHandler(async (req: Request, res: Response) => {
     const admin = await this.service.createAdmin(req.body);
-    sendSuccessResponse(res, admin, 'Admin created successfully', 201);
+    sendSuccessResponse(res, { data: admin, message: 'Admin created successfully', statusCode: 201 });
   });
 
   getById = asyncHandler(async (req: Request, res: Response) => {
     const admin = await this.service.getAdminById(getIdParam(req));
-    sendSuccessResponse(res, admin);
+    sendSuccessResponse(res, { data: admin });
   });
 
   getAll = asyncHandler(async (req: Request, res: Response) => {
@@ -35,16 +35,16 @@ export class AdminController {
     
     const { admins, total } = await this.service.getAllAdmins(page, limit, sortBy, sortOrder, filter);
     const pagination = calculatePaginationMeta(page, limit, total);
-    sendSuccessResponse(res, admins, 'Admins retrieved successfully', 200, pagination);
+    sendSuccessResponse(res, { data: admins, message: 'Admins retrieved successfully', pagination });
   });
 
   update = asyncHandler(async (req: Request, res: Response) => {
     const admin = await this.service.updateAdmin(getIdParam(req), req.body);
-    sendSuccessResponse(res, admin, 'Admin updated successfully');
+    sendSuccessResponse(res, { data: admin, message: 'Admin updated successfully' });
   });
 
   delete = asyncHandler(async (req: Request, res: Response) => {
     await this.service.deleteAdmin(getIdParam(req));
-    sendSuccessResponse(res, null, 'Admin deleted successfully');
+    sendSuccessResponse(res, { data: null, message: 'Admin deleted successfully' });
   });
 }

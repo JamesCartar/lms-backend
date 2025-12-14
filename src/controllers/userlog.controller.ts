@@ -25,33 +25,33 @@ export class UserLogController {
     
     const { logs, total } = await this.service.getAllUserLogs(page, limit, sortBy, sortOrder, filter);
     const pagination = calculatePaginationMeta(page, limit, total);
-    sendSuccessResponse(res, logs, 'User logs retrieved successfully', 200, pagination);
+    sendSuccessResponse(res, { data: logs, message: 'User logs retrieved successfully', pagination });
   });
 
   getById = asyncHandler(async (req: Request, res: Response) => {
     const log = await this.service.getUserLogById(getIdParam(req));
-    sendSuccessResponse(res, log);
+    sendSuccessResponse(res, { data: log });
   });
 
   getByUserId = asyncHandler(async (req: Request, res: Response) => {
     const { page, limit } = getPaginationParams(req);
     const { logs, total } = await this.service.getUserLogsByUserId(getRequiredParam(req, "userId"), page, limit);
     const pagination = calculatePaginationMeta(page, limit, total);
-    sendSuccessResponse(res, logs, 'User logs retrieved successfully', 200, pagination);
+    sendSuccessResponse(res, { data: logs, message: 'User logs retrieved successfully', pagination });
   });
 
   clearAll = asyncHandler(async (_req: Request, res: Response) => {
     const result = await this.service.clearAllUserLogs();
-    sendSuccessResponse(res, result, 'All user logs cleared successfully');
+    sendSuccessResponse(res, { data: result, message: 'All user logs cleared successfully' });
   });
 
   clearByUserId = asyncHandler(async (req: Request, res: Response) => {
     const result = await this.service.clearUserLogsByUserId(getRequiredParam(req, "userId"));
-    sendSuccessResponse(res, result, 'User logs cleared successfully');
+    sendSuccessResponse(res, { data: result, message: 'User logs cleared successfully' });
   });
 
   deleteById = asyncHandler(async (req: Request, res: Response) => {
     await this.service.deleteUserLogById(getIdParam(req));
-    sendSuccessResponse(res, null, 'User log deleted successfully');
+    sendSuccessResponse(res, { data: null, message: 'User log deleted successfully' });
   });
 }
