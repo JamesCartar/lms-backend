@@ -21,21 +21,22 @@ export class RoleRepository {
     skip: number,
     limit: number,
     sortBy: string = 'createdAt',
-    sortOrder: 'asc' | 'desc' = 'desc'
+    sortOrder: 'asc' | 'desc' = 'desc',
+    filter: Record<string, any> = {}
   ): Promise<DocumentType<Role>[]> {
     const sortObj: Record<string, 1 | -1> = {
       [sortBy]: sortOrder === 'asc' ? 1 : -1,
     };
     
-    return await RoleModel.find()
+    return await RoleModel.find(filter)
       .populate('permissions')
       .sort(sortObj)
       .skip(skip)
       .limit(limit);
   }
 
-  async count(): Promise<number> {
-    return await RoleModel.countDocuments();
+  async count(filter: Record<string, any> = {}): Promise<number> {
+    return await RoleModel.countDocuments(filter);
   }
 
   async update(id: string, data: Partial<Role>): Promise<DocumentType<Role> | null> {

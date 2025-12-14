@@ -4,6 +4,7 @@ import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
 import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 import { getIdParam, getRequiredParam } from '../utils/params.util';
+import { buildUserLogFilter, UserLogFilterQuery } from '../filters/userlog.filter';
 
 /**
  * UserLog Controller - Handles HTTP requests for UserLog
@@ -17,7 +18,12 @@ export class UserLogController {
 
   getAll = asyncHandler(async (req: Request, res: Response) => {
     const { page, limit, sortBy, sortOrder } = getPaginationParams(req);
-    const { logs, total } = await this.service.getAllUserLogs(page, limit, sortBy, sortOrder);
+    
+    // Get validated filter query from middleware
+    const filterQuery = (req as any).validatedQuery as UserLogFilterQuery;
+    const filter = buildUserLogFilter(filterQuery || {});
+    
+    const { logs, total } = await this.service.getAllUserLogs(page, limit, sortBy, sortOrder, filter);
     const pagination = calculatePaginationMeta(page, limit, total);
     sendSuccessResponse(res, logs, 'User logs retrieved successfully', 200, pagination);
   });

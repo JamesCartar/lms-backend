@@ -24,7 +24,7 @@ export class AppError extends Error {
  * 400 Bad Request Error
  */
 export class BadRequestError extends AppError {
-  constructor(message: string = 'Bad request') {
+  constructor(message: string = 'The request is invalid. Please check your input') {
     super(message, 400);
   }
 }
@@ -33,7 +33,7 @@ export class BadRequestError extends AppError {
  * 401 Unauthorized Error
  */
 export class UnauthorizedError extends AppError {
-  constructor(message: string = 'Unauthorized access') {
+  constructor(message: string = 'You need to be logged in to access this resource') {
     super(message, 401);
   }
 }
@@ -42,7 +42,7 @@ export class UnauthorizedError extends AppError {
  * 403 Forbidden Error
  */
 export class ForbiddenError extends AppError {
-  constructor(message: string = 'Access forbidden') {
+  constructor(message: string = 'You do not have permission to access this resource') {
     super(message, 403);
   }
 }
@@ -51,7 +51,7 @@ export class ForbiddenError extends AppError {
  * 404 Not Found Error
  */
 export class NotFoundError extends AppError {
-  constructor(message: string = 'Resource not found') {
+  constructor(message: string = 'The requested resource was not found') {
     super(message, 404);
   }
 }
@@ -60,7 +60,7 @@ export class NotFoundError extends AppError {
  * 409 Conflict Error
  */
 export class ConflictError extends AppError {
-  constructor(message: string = 'Resource conflict') {
+  constructor(message: string = 'This operation conflicts with existing data') {
     super(message, 409);
   }
 }
@@ -71,7 +71,7 @@ export class ConflictError extends AppError {
 export class ValidationError extends AppError {
   public errors?: ValidationErrors;
 
-  constructor(message: string = 'Validation failed', errors?: ValidationErrors) {
+  constructor(message: string = 'Please check your input and try again', errors?: ValidationErrors) {
     super(message, 422);
     this.errors = errors;
   }
@@ -81,7 +81,7 @@ export class ValidationError extends AppError {
  * 500 Database Error
  */
 export class DatabaseError extends AppError {
-  constructor(message: string = 'Database operation failed') {
+  constructor(message: string = 'A database error occurred. Please try again') {
     super(message, 500);
   }
 }
@@ -90,7 +90,7 @@ export class DatabaseError extends AppError {
  * 500 Internal Server Error
  */
 export class InternalServerError extends AppError {
-  constructor(message: string = 'Internal server error') {
+  constructor(message: string = 'An unexpected error occurred. Please try again later') {
     super(message, 500);
   }
 }

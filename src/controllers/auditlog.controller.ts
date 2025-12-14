@@ -4,6 +4,7 @@ import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
 import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
 import { getIdParam, getRequiredParam } from '../utils/params.util';
+import { buildAuditLogFilter, AuditLogFilterQuery } from '../filters/auditlog.filter';
 
 /**
  * AuditLog Controller - Handles HTTP requests for AuditLog
@@ -17,7 +18,12 @@ export class AuditLogController {
 
   getAll = asyncHandler(async (req: Request, res: Response) => {
     const { page, limit, sortBy, sortOrder } = getPaginationParams(req);
-    const { logs, total } = await this.service.getAllAuditLogs(page, limit, sortBy, sortOrder);
+    
+    // Get validated filter query from middleware
+    const filterQuery = (req as any).validatedQuery as AuditLogFilterQuery;
+    const filter = buildAuditLogFilter(filterQuery || {});
+    
+    const { logs, total } = await this.service.getAllAuditLogs(page, limit, sortBy, sortOrder, filter);
     const pagination = calculatePaginationMeta(page, limit, total);
     sendSuccessResponse(res, logs, 'Audit logs retrieved successfully', 200, pagination);
   });

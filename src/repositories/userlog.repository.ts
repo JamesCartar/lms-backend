@@ -18,20 +18,21 @@ export class UserLogRepository {
     skip: number,
     limit: number,
     sortBy: string = 'loginTime',
-    sortOrder: 'asc' | 'desc' = 'desc'
+    sortOrder: 'asc' | 'desc' = 'desc',
+    filter: Record<string, any> = {}
   ): Promise<DocumentType<UserLog>[]> {
     const sortObj: Record<string, 1 | -1> = {
       [sortBy]: sortOrder === 'asc' ? 1 : -1,
     };
     
-    return await UserLogModel.find()
+    return await UserLogModel.find(filter)
       .sort(sortObj)
       .skip(skip)
       .limit(limit);
   }
 
-  async count(): Promise<number> {
-    return await UserLogModel.countDocuments();
+  async count(filter: Record<string, any> = {}): Promise<number> {
+    return await UserLogModel.countDocuments(filter);
   }
 
   async findByUserId(

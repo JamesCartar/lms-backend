@@ -56,11 +56,12 @@ export class AdminService {
     page: number = 1,
     limit: number = 10,
     sortBy?: string,
-    sortOrder?: 'asc' | 'desc'
+    sortOrder?: 'asc' | 'desc',
+    filter: Record<string, any> = {}
   ) {
     const skip = calculateSkip(page, limit);
-    const admins = await this.repository.findAll(skip, limit, sortBy, sortOrder);
-    const total = await this.repository.count();
+    const admins = await this.repository.findAll(skip, limit, sortBy, sortOrder, filter);
+    const total = await this.repository.count(filter);
     return { admins, total };
   }
 
