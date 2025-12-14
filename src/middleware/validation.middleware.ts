@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { ValidationError } from '../utils/errors.util';
+import { ValidatedQuery } from '../types/request.types';
+import '../types/request.types';
 
 /**
  * Convert Zod error messages to user-friendly messages
@@ -81,7 +83,7 @@ export const validateQuery = (schema: z.ZodSchema) => {
     try {
       const validated = await schema.parseAsync(req.query);
       // Store validated query in req for later use
-      (req as any).validatedQuery = validated;
+      req.validatedQuery = validated as unknown as ValidatedQuery;
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {

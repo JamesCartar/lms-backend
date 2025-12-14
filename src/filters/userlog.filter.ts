@@ -20,7 +20,7 @@ export type UserLogFilterQuery = z.infer<typeof UserLogFilterQuerySchema>;
 /**
  * Build MongoDB filter object from validated query parameters
  */
-export const buildUserLogFilter = (query: UserLogFilterQuery): Record<string, any> => {
+export const buildUserLogFilter = (query: Partial<UserLogFilterQuery>): Record<string, any> => {
   const filters: Record<string, any>[] = [];
 
   // Search filter - searches across email and IP fields

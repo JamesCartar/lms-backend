@@ -18,7 +18,7 @@ export type RoleFilterQuery = z.infer<typeof RoleFilterQuerySchema>;
 /**
  * Build MongoDB filter object from validated query parameters
  */
-export const buildRoleFilter = (query: RoleFilterQuery): Record<string, any> => {
+export const buildRoleFilter = (query: Partial<RoleFilterQuery>): Record<string, any> => {
   const filters: Record<string, any>[] = [];
 
   // Search filter - searches across name and description fields
