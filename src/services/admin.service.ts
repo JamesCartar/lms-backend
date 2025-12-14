@@ -1,6 +1,7 @@
 import { AdminRepository } from '../repositories/admin.repository';
 import { RoleRepository } from '../repositories/role.repository';
 import { AdminCreateInput, AdminUpdateInput } from '../models/admin.model';
+import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
 
 /**
  * Admin Service - Business logic layer for Admin
@@ -17,19 +18,19 @@ export class AdminService {
   async createAdmin(data: AdminCreateInput) {
     // Validation ensures required fields exist, but TypeScript doesn't know that
     if (!data.email || !data.name || !data.password) {
-      throw new Error('Email, name, and password are required');
+      throw new BadRequestError('Email, name, and password are required');
     }
     
     const existing = await this.repository.findByEmail(data.email);
     if (existing) {
-      throw new Error('Admin with this email already exists');
+      throw new ConflictError('Admin with this email already exists');
     }
 
     // Validate role if provided
     if (data.role) {
       const role = await this.roleRepository.findById(data.role);
       if (!role) {
-        throw new Error('Role not found');
+        throw new NotFoundError('Role not found');
       }
     }
 
@@ -47,7 +48,7 @@ export class AdminService {
   async getAdminById(id: string) {
     const admin = await this.repository.findById(id);
     if (!admin) {
-      throw new Error('Admin not found');
+      throw new NotFoundError('Admin not found');
     }
     return admin;
   }
@@ -60,7 +61,7 @@ export class AdminService {
     if (data.email) {
       const existing = await this.repository.findByEmail(data.email);
       if (existing && existing._id.toString() !== id) {
-        throw new Error('Admin with this email already exists');
+        throw new ConflictError('Admin with this email already exists');
       }
     }
 
@@ -68,7 +69,7 @@ export class AdminService {
     if (data.role) {
       const role = await this.roleRepository.findById(data.role);
       if (!role) {
-        throw new Error('Role not found');
+        throw new NotFoundError('Role not found');
       }
     }
 
@@ -82,7 +83,7 @@ export class AdminService {
       isActive: data.isActive,
     });
     if (!admin) {
-      throw new Error('Admin not found');
+      throw new NotFoundError('Admin not found');
     }
     return admin;
   }
@@ -90,7 +91,7 @@ export class AdminService {
   async deleteAdmin(id: string) {
     const admin = await this.repository.delete(id);
     if (!admin) {
-      throw new Error('Admin not found');
+      throw new NotFoundError('Admin not found');
     }
     return admin;
   }

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
+import { ValidationError } from '../utils/errors.util';
 
 /**
  * Validation middleware for request validation using Zod schemas
@@ -11,16 +12,14 @@ export const validate = (schema: z.ZodSchema) => {
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
-          success: false,
-          message: 'Validation error',
-          errors: error.issues.map((err) => ({
-            field: err.path.join('.'),
-            message: err.message,
-          })),
-        });
+        const errors = error.issues.map((err) => ({
+          field: err.path.join('.'),
+          message: err.message,
+        }));
+        next(new ValidationError('Validation failed', errors));
+      } else {
+        next(error);
       }
-      next(error);
     }
   };
 };

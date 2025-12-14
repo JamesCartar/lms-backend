@@ -1,6 +1,7 @@
 import { RoleRepository } from '../repositories/role.repository';
 import { PermissionRepository } from '../repositories/permission.repository';
 import { RoleCreateInput, RoleUpdateInput } from '../models/role.model';
+import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
 
 /**
  * Role Service - Business logic layer for Role
@@ -17,19 +18,19 @@ export class RoleService {
   async createRole(data: RoleCreateInput) {
     // Validation ensures name exists, but TypeScript doesn't know that
     if (!data.name) {
-      throw new Error('Name is required');
+      throw new BadRequestError('Name is required');
     }
     
     const existing = await this.repository.findByName(data.name);
     if (existing) {
-      throw new Error('Role with this name already exists');
+      throw new ConflictError('Role with this name already exists');
     }
 
     // Validate permissions if provided
     if (data.permissions && data.permissions.length > 0) {
       const permissions = await this.permissionRepository.findByIds(data.permissions as string[]);
       if (permissions.length !== data.permissions.length) {
-        throw new Error('One or more permissions not found');
+        throw new NotFoundError('One or more permissions not found');
       }
     }
 
@@ -44,7 +45,7 @@ export class RoleService {
   async getRoleById(id: string) {
     const role = await this.repository.findById(id);
     if (!role) {
-      throw new Error('Role not found');
+      throw new NotFoundError('Role not found');
     }
     return role;
   }
@@ -57,7 +58,7 @@ export class RoleService {
     if (data.name) {
       const existing = await this.repository.findByName(data.name);
       if (existing && existing._id.toString() !== id) {
-        throw new Error('Role with this name already exists');
+        throw new ConflictError('Role with this name already exists');
       }
     }
 
@@ -65,7 +66,7 @@ export class RoleService {
     if (data.permissions && data.permissions.length > 0) {
       const permissions = await this.permissionRepository.findByIds(data.permissions as string[]);
       if (permissions.length !== data.permissions.length) {
-        throw new Error('One or more permissions not found');
+        throw new NotFoundError('One or more permissions not found');
       }
     }
 
@@ -76,7 +77,7 @@ export class RoleService {
       permissions: data.permissions as any,
     });
     if (!role) {
-      throw new Error('Role not found');
+      throw new NotFoundError('Role not found');
     }
     return role;
   }
@@ -84,7 +85,7 @@ export class RoleService {
   async deleteRole(id: string) {
     const role = await this.repository.delete(id);
     if (!role) {
-      throw new Error('Role not found');
+      throw new NotFoundError('Role not found');
     }
     return role;
   }

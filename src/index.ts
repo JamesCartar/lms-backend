@@ -1,6 +1,8 @@
 import express, { Application, Request, Response } from 'express';
 import { connectDatabase } from './config/database';
 import routes from './routes';
+import { errorHandler } from './middleware/error.middleware';
+import { sendSuccessResponse } from './utils/response.util';
 
 /**
  * Main Application - Express server setup
@@ -14,11 +16,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Health check route
 app.get('/health', (req: Request, res: Response) => {
-  res.status(200).json({
-    success: true,
-    message: 'LMS Backend is running',
+  sendSuccessResponse(res, {
+    status: 'healthy',
     timestamp: new Date().toISOString(),
-  });
+  }, 'LMS Backend is running');
 });
 
 // API routes
@@ -29,8 +30,12 @@ app.use((req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: 'Route not found',
+    timestamp: new Date().toISOString(),
   });
 });
+
+// Global error handler (must be last)
+app.use(errorHandler);
 
 // Start server
 const startServer = async () => {

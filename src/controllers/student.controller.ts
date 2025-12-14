@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { StudentService } from '../services/student.service';
+import { sendSuccessResponse } from '../utils/response.util';
+import { asyncHandler } from '../middleware/error.middleware';
 
 /**
  * Student Controller - Handles HTTP requests for Student
@@ -11,96 +13,34 @@ export class StudentController {
     this.service = new StudentService();
   }
 
-  create = async (req: Request, res: Response) => {
-    try {
-      const student = await this.service.createStudent(req.body);
-      res.status(201).json({
-        success: true,
-        message: 'Student created successfully',
-        data: student,
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to create student',
-      });
-    }
-  };
+  create = asyncHandler(async (req: Request, res: Response) => {
+    const student = await this.service.createStudent(req.body);
+    sendSuccessResponse(res, student, 'Student created successfully', 201);
+  });
 
-  getById = async (req: Request, res: Response) => {
-    try {
-      const student = await this.service.getStudentById(req.params.id);
-      res.status(200).json({
-        success: true,
-        data: student,
-      });
-    } catch (error) {
-      res.status(404).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Student not found',
-      });
-    }
-  };
+  getById = asyncHandler(async (req: Request, res: Response) => {
+    const student = await this.service.getStudentById(req.params.id);
+    sendSuccessResponse(res, student);
+  });
 
-  getAll = async (req: Request, res: Response) => {
-    try {
-      const students = await this.service.getAllStudents();
-      res.status(200).json({
-        success: true,
-        data: students,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to fetch students',
-      });
-    }
-  };
+  getAll = asyncHandler(async (req: Request, res: Response) => {
+    const students = await this.service.getAllStudents();
+    sendSuccessResponse(res, students);
+  });
 
-  getByEnrollmentYear = async (req: Request, res: Response) => {
-    try {
-      const year = parseInt(req.params.year);
-      const students = await this.service.getStudentsByEnrollmentYear(year);
-      res.status(200).json({
-        success: true,
-        data: students,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to fetch students',
-      });
-    }
-  };
+  getByEnrollmentYear = asyncHandler(async (req: Request, res: Response) => {
+    const year = parseInt(req.params.year);
+    const students = await this.service.getStudentsByEnrollmentYear(year);
+    sendSuccessResponse(res, students);
+  });
 
-  update = async (req: Request, res: Response) => {
-    try {
-      const student = await this.service.updateStudent(req.params.id, req.body);
-      res.status(200).json({
-        success: true,
-        message: 'Student updated successfully',
-        data: student,
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to update student',
-      });
-    }
-  };
+  update = asyncHandler(async (req: Request, res: Response) => {
+    const student = await this.service.updateStudent(req.params.id, req.body);
+    sendSuccessResponse(res, student, 'Student updated successfully');
+  });
 
-  delete = async (req: Request, res: Response) => {
-    try {
-      await this.service.deleteStudent(req.params.id);
-      res.status(200).json({
-        success: true,
-        message: 'Student deleted successfully',
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to delete student',
-      });
-    }
-  };
+  delete = asyncHandler(async (req: Request, res: Response) => {
+    await this.service.deleteStudent(req.params.id);
+    sendSuccessResponse(res, null, 'Student deleted successfully');
+  });
 }

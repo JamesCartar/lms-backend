@@ -1,0 +1,93 @@
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { UnauthorizedError } from '../utils/errors.util';
+import { JwtPayload } from '../types/jwt.types';
+
+/**
+ * Authentication Middleware
+ * Validates JWT token from Authorization header and attaches payload to request
+ */
+export const authenticate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    // Get token from Authorization header
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedError('No token provided. Please authenticate.');
+    }
+
+    // Extract token
+    const token = authHeader.split(' ')[1];
+    
+    if (!token) {
+      throw new UnauthorizedError('Invalid token format');
+    }
+
+    // Get JWT secret from environment
+    const jwtSecret = process.env.JWT_SECRET;
+    
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not configured');
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+
+    // Attach decoded payload to request
+    req.jwt = decoded;
+    req.user = decoded; // Also set user for compatibility
+
+    next();
+  } catch (error) {
+    if (error instanceof jwt.JsonWebTokenError) {
+      next(new UnauthorizedError('Invalid token'));
+    } else if (error instanceof jwt.TokenExpiredError) {
+      next(new UnauthorizedError('Token expired'));
+    } else {
+      next(error);
+    }
+  }
+};
+
+/**
+ * Optional authentication - doesn't throw error if no token
+ * Useful for endpoints that work with or without authentication
+ */
+export const optionalAuthenticate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return next();
+    }
+
+    const token = authHeader.split(' ')[1];
+    
+    if (!token) {
+      return next();
+    }
+
+    const jwtSecret = process.env.JWT_SECRET;
+    
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET is not configured');
+    }
+
+    const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+    req.jwt = decoded;
+    req.user = decoded;
+
+    next();
+  } catch (error) {
+    // Silently continue without authentication
+    next();
+  }
+};
