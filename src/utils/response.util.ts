@@ -59,8 +59,7 @@ export const sendSuccessResponseWithResource = <T = unknown>(
   statusCode: number = 200,
   pagination?: PaginationMeta
 ): Response => {
-  type WrappedData = { [key: string]: T };
-  const wrappedData: WrappedData = { [resourceKey]: data };
+  const wrappedData: Record<string, T> = { [resourceKey]: data };
   
   const responseData = pagination 
     ? { items: wrappedData, pagination }
