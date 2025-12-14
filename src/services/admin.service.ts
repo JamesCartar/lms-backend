@@ -1,10 +1,12 @@
-import { AdminRepository } from '../repositories/admin.repository';
-import { RoleRepository } from '../repositories/role.repository';
-import { AdminCreateInput, AdminUpdateInput } from '../models/admin.model';
-import { NotFoundError, ConflictError } from '../utils/errors.util';
-import { calculateSkip } from '../utils/pagination.util';
-import { Ref } from '@typegoose/typegoose';
-import { Role } from '../models/role.model';
+import { AdminRepository } from "../repositories/admin.repository";
+import { RoleRepository } from "../repositories/role.repository";
+import type { AdminCreateInput, AdminUpdateInput } from "../models/admin.model";
+import type { Admin } from "../models/admin.model";
+import { NotFoundError, ConflictError } from "../utils/errors.util";
+import { calculateSkip } from "../utils/pagination.util";
+import type { Ref } from "@typegoose/typegoose";
+import type { Role } from "../models/role.model";
+import type { FilterQuery } from "mongoose";
 
 /**
  * Admin Service - Business logic layer for Admin
@@ -52,18 +54,24 @@ export class AdminService {
     return admin;
   }
 
-  async getAllAdmins(
-    page: number = 1,
-    limit: number = 10,
-    sortBy?: string,
-    sortOrder?: 'asc' | 'desc',
-    filter: Record<string, any> = {}
-  ) {
-    const skip = calculateSkip(page, limit);
-    const admins = await this.repository.findAll(skip, limit, sortBy, sortOrder, filter);
-    const total = await this.repository.count(filter);
-    return { admins, total };
-  }
+	async getAllAdmins(
+		page = 1,
+		limit = 10,
+		sortBy?: string,
+		sortOrder?: "asc" | "desc",
+		filter: FilterQuery<Admin> = {},
+	) {
+		const skip = calculateSkip(page, limit);
+		const admins = await this.repository.findAll(
+			skip,
+			limit,
+			sortBy,
+			sortOrder,
+			filter,
+		);
+		const total = await this.repository.count(filter);
+		return { admins, total };
+	}
 
   async updateAdmin(id: string, data: AdminUpdateInput) {
     if (data.email) {

@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express, { Application, Request, Response } from 'express';
+import express, { type Application, type Request, type Response } from 'express';
 import { connectDatabase } from './config/database';
 import routes from './routes';
 import { errorHandler } from './middleware/error.middleware';

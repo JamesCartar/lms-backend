@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Request } from 'express';
+import type { Request } from 'express';
 
 /**
  * Pagination query schema for validation

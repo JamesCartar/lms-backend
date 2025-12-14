@@ -1,7 +1,9 @@
-import { UserLogRepository } from '../repositories/userlog.repository';
-import { NotFoundError } from '../utils/errors.util';
-import { Types } from 'mongoose';
-import { calculateSkip } from '../utils/pagination.util';
+import { UserLogRepository } from "../repositories/userlog.repository";
+import type { UserLog } from "../models/userlog.model";
+import { NotFoundError } from "../utils/errors.util";
+import { Types } from "mongoose";
+import { calculateSkip } from "../utils/pagination.util";
+import type { FilterQuery } from "mongoose";
 
 /**
  * UserLog Service - Business logic layer for UserLog
@@ -38,18 +40,24 @@ export class UserLogService {
     return log;
   }
 
-  async getAllUserLogs(
-    page: number,
-    limit: number,
-    sortBy?: string,
-    sortOrder?: 'asc' | 'desc',
-    filter: Record<string, any> = {}
-  ) {
-    const skip = calculateSkip(page, limit);
-    const logs = await this.repository.findAll(skip, limit, sortBy, sortOrder, filter);
-    const total = await this.repository.count(filter);
-    return { logs, total };
-  }
+	async getAllUserLogs(
+		page: number,
+		limit: number,
+		sortBy?: string,
+		sortOrder?: "asc" | "desc",
+		filter: FilterQuery<UserLog> = {},
+	) {
+		const skip = calculateSkip(page, limit);
+		const logs = await this.repository.findAll(
+			skip,
+			limit,
+			sortBy,
+			sortOrder,
+			filter,
+		);
+		const total = await this.repository.count(filter);
+		return { logs, total };
+	}
 
   async getUserLogsByUserId(userId: string, page: number, limit: number) {
     const skip = calculateSkip(page, limit);

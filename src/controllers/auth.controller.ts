@@ -1,13 +1,19 @@
-import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { AdminModel } from '../models/admin.model';
-import { StudentModel } from '../models/student.model';
-import { sendSuccessResponse } from '../utils/response.util';
-import { asyncHandler } from '../middleware/error.middleware';
-import { UnauthorizedError } from '../utils/errors.util';
-import { UserLogService } from '../services/userlog.service';
-import { PopulatedRole, hasPermissionDocuments } from '../types/populated.types';
+import type { Request, Response } from "express";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { AdminModel } from "../models/admin.model";
+import type { Admin } from "../models/admin.model";
+import { StudentModel } from "../models/student.model";
+import type { Student } from "../models/student.model";
+import type { DocumentType } from "@typegoose/typegoose";
+import { sendSuccessResponse } from "../utils/response.util";
+import { asyncHandler } from "../middleware/error.middleware";
+import { UnauthorizedError } from "../utils/errors.util";
+import { UserLogService } from "../services/userlog.service";
+import {
+	type PopulatedRole,
+	hasPermissionDocuments,
+} from "../types/populated.types";
 
 /**
  * Auth Controller - Handles authentication and login
@@ -187,31 +193,33 @@ export class AuthController {
   /**
    * Get current user info
    */
-  getMe = asyncHandler(async (req: Request, res: Response) => {
-    if (!req.jwt) {
-      throw new UnauthorizedError('Not authenticated');
-    }
+	getMe = asyncHandler(async (req: Request, res: Response) => {
+		if (!req.jwt) {
+			throw new UnauthorizedError("Not authenticated");
+		}
 
-    const { id, type } = req.jwt;
+		const { id, type } = req.jwt;
 
-    let user;
-    if (type === 'admin') {
-      user = await AdminModel.findById(id).select('-password').populate({
-        path: 'role',
-        select: 'name description type permissions',
-        populate: { 
-          path: 'permissions',
-          select: 'name resource action description'
-        }
-      });
-    } else {
-      user = await StudentModel.findById(id).select('-password');
-    }
+		let user: DocumentType<Admin> | DocumentType<Student> | null;
+		if (type === "admin") {
+			user = await AdminModel.findById(id)
+				.select("-password")
+				.populate({
+					path: "role",
+					select: "name description type permissions",
+					populate: {
+						path: "permissions",
+						select: "name resource action description",
+					},
+				});
+		} else {
+			user = await StudentModel.findById(id).select("-password");
+		}
 
-    if (!user) {
-      throw new UnauthorizedError('User not found');
-    }
+		if (!user) {
+			throw new UnauthorizedError("User not found");
+		}
 
-    sendSuccessResponse(res, { data: { user, jwt: req.jwt } });
-  });
+		sendSuccessResponse(res, { data: { user, jwt: req.jwt } });
+	});
 }

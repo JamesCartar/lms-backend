@@ -1,7 +1,9 @@
-import { StudentRepository } from '../repositories/student.repository';
-import { StudentCreateInput, StudentUpdateInput } from '../models/student.model';
-import { NotFoundError, ConflictError } from '../utils/errors.util';
-import { calculateSkip } from '../utils/pagination.util';
+import { StudentRepository } from "../repositories/student.repository";
+import type { StudentCreateInput, StudentUpdateInput } from "../models/student.model";
+import type { Student } from "../models/student.model";
+import { NotFoundError, ConflictError } from "../utils/errors.util";
+import { calculateSkip } from "../utils/pagination.util";
+import type { FilterQuery } from "mongoose";
 
 /**
  * Student Service - Business logic layer for Student
@@ -32,18 +34,24 @@ export class StudentService {
     return student;
   }
 
-  async getAllStudents(
-    page: number = 1,
-    limit: number = 10,
-    sortBy?: string,
-    sortOrder?: 'asc' | 'desc',
-    filter: Record<string, any> = {}
-  ) {
-    const skip = calculateSkip(page, limit);
-    const students = await this.repository.findAll(skip, limit, sortBy, sortOrder, filter);
-    const total = await this.repository.count(filter);
-    return { students, total };
-  }
+	async getAllStudents(
+		page = 1,
+		limit = 10,
+		sortBy?: string,
+		sortOrder?: "asc" | "desc",
+		filter: FilterQuery<Student> = {},
+	) {
+		const skip = calculateSkip(page, limit);
+		const students = await this.repository.findAll(
+			skip,
+			limit,
+			sortBy,
+			sortOrder,
+			filter,
+		);
+		const total = await this.repository.count(filter);
+		return { students, total };
+	}
 
   async getStudentsByEnrollmentYear(year: number) {
     return await this.repository.findByEnrollmentYear(year);

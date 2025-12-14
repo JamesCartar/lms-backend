@@ -1,10 +1,16 @@
-import { RoleRepository } from '../repositories/role.repository';
-import { PermissionRepository } from '../repositories/permission.repository';
-import { RoleCreateInput, RoleUpdateInput } from '../models/role.model';
-import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
-import { calculateSkip } from '../utils/pagination.util';
-import { Ref } from '@typegoose/typegoose';
-import { Permission } from '../models/permission.model';
+import { RoleRepository } from "../repositories/role.repository";
+import { PermissionRepository } from "../repositories/permission.repository";
+import type { RoleCreateInput, RoleUpdateInput } from "../models/role.model";
+import type { Role } from "../models/role.model";
+import {
+	NotFoundError,
+	ConflictError,
+	BadRequestError,
+} from "../utils/errors.util";
+import { calculateSkip } from "../utils/pagination.util";
+import type { Ref } from "@typegoose/typegoose";
+import type { Permission } from "../models/permission.model";
+import type { FilterQuery } from "mongoose";
 
 /**
  * Role Service - Business logic layer for Role
@@ -50,18 +56,24 @@ export class RoleService {
     return role;
   }
 
-  async getAllRoles(
-    page: number = 1,
-    limit: number = 10,
-    sortBy?: string,
-    sortOrder?: 'asc' | 'desc',
-    filter: Record<string, any> = {}
-  ) {
-    const skip = calculateSkip(page, limit);
-    const roles = await this.repository.findAll(skip, limit, sortBy, sortOrder, filter);
-    const total = await this.repository.count(filter);
-    return { roles, total };
-  }
+	async getAllRoles(
+		page = 1,
+		limit = 10,
+		sortBy?: string,
+		sortOrder?: "asc" | "desc",
+		filter: FilterQuery<Role> = {},
+	) {
+		const skip = calculateSkip(page, limit);
+		const roles = await this.repository.findAll(
+			skip,
+			limit,
+			sortBy,
+			sortOrder,
+			filter,
+		);
+		const total = await this.repository.count(filter);
+		return { roles, total };
+	}
 
   async getAllRoleNames() {
     const roles = await this.repository.findAllNames();

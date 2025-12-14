@@ -1,7 +1,10 @@
-import { AuditLogRepository } from '../repositories/auditlog.repository';
-import { NotFoundError } from '../utils/errors.util';
-import { Types } from 'mongoose';
-import { calculateSkip } from '../utils/pagination.util';
+import { AuditLogRepository } from "../repositories/auditlog.repository";
+import type { AuditLog } from "../models/auditlog.model";
+import type { AuditLogChanges } from "../types/mongodb.types";
+import { NotFoundError } from "../utils/errors.util";
+import { Types } from "mongoose";
+import { calculateSkip } from "../utils/pagination.util";
+import type { FilterQuery } from "mongoose";
 
 /**
  * AuditLog Service - Business logic layer for AuditLog
@@ -13,30 +16,32 @@ export class AuditLogService {
     this.repository = new AuditLogRepository();
   }
 
-  async createAuditLog(data: {
-    userId: string;
-    userType: 'admin' | 'student';
-    email: string;
-    action: 'CREATE' | 'UPDATE' | 'DELETE';
-    resource: string;
-    resourceId?: string;
-    changes?: Record<string, any>;
-    ip?: string;
-    userAgent?: string;
-  }) {
-    return await this.repository.create({
-      userId: new Types.ObjectId(data.userId),
-      userType: data.userType,
-      email: data.email,
-      action: data.action,
-      resource: data.resource,
-      resourceId: data.resourceId ? new Types.ObjectId(data.resourceId) : undefined,
-      changes: data.changes,
-      ip: data.ip,
-      userAgent: data.userAgent,
-      timestamp: new Date(),
-    });
-  }
+	async createAuditLog(data: {
+		userId: string;
+		userType: "admin" | "student";
+		email: string;
+		action: "CREATE" | "UPDATE" | "DELETE";
+		resource: string;
+		resourceId?: string;
+		changes?: AuditLogChanges;
+		ip?: string;
+		userAgent?: string;
+	}) {
+		return await this.repository.create({
+			userId: new Types.ObjectId(data.userId),
+			userType: data.userType,
+			email: data.email,
+			action: data.action,
+			resource: data.resource,
+			resourceId: data.resourceId
+				? new Types.ObjectId(data.resourceId)
+				: undefined,
+			changes: data.changes,
+			ip: data.ip,
+			userAgent: data.userAgent,
+			timestamp: new Date(),
+		});
+	}
 
   async getAuditLogById(id: string) {
     const log = await this.repository.findById(id);
@@ -46,18 +51,24 @@ export class AuditLogService {
     return log;
   }
 
-  async getAllAuditLogs(
-    page: number,
-    limit: number,
-    sortBy?: string,
-    sortOrder?: 'asc' | 'desc',
-    filter: Record<string, any> = {}
-  ) {
-    const skip = calculateSkip(page, limit);
-    const logs = await this.repository.findAll(skip, limit, sortBy, sortOrder, filter);
-    const total = await this.repository.count(filter);
-    return { logs, total };
-  }
+	async getAllAuditLogs(
+		page: number,
+		limit: number,
+		sortBy?: string,
+		sortOrder?: "asc" | "desc",
+		filter: FilterQuery<AuditLog> = {},
+	) {
+		const skip = calculateSkip(page, limit);
+		const logs = await this.repository.findAll(
+			skip,
+			limit,
+			sortBy,
+			sortOrder,
+			filter,
+		);
+		const total = await this.repository.count(filter);
+		return { logs, total };
+	}
 
   async getAuditLogsByUserId(userId: string, page: number, limit: number) {
     const skip = calculateSkip(page, limit);

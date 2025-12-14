@@ -1,5 +1,5 @@
 import { prop, getModelForClass } from '@typegoose/typegoose';
-import { Types } from 'mongoose';
+import type { Types } from 'mongoose';
 
 /**
  * UserLog Model - Tracks user login activity

@@ -1,4 +1,6 @@
-import { z } from 'zod';
+import { z } from "zod";
+import type { FilterQuery } from "mongoose";
+import type { DateRangeOperator } from "../types/mongodb.types";
 
 /**
  * Filter utility types and helpers for building MongoDB filters from query parameters
@@ -18,9 +20,17 @@ export interface CommonFilterOptions {
  * These are common across all entities
  */
 export const BaseFilterQuerySchema = z.object({
-  search: z.string().min(1).max(100).optional(),
-  createdBefore: z.string().datetime().optional().transform((val) => val ? new Date(val) : undefined),
-  createdAfter: z.string().datetime().optional().transform((val) => val ? new Date(val) : undefined),
+	search: z.string().min(1).max(100).optional(),
+	createdBefore: z
+		.string()
+		.datetime()
+		.optional()
+		.transform((val) => (val ? new Date(val) : undefined)),
+	createdAfter: z
+		.string()
+		.datetime()
+		.optional()
+		.transform((val) => (val ? new Date(val) : undefined)),
 });
 
 /**
@@ -28,24 +38,24 @@ export const BaseFilterQuerySchema = z.object({
  * Handles createdBefore (includes all of that day) and createdAfter
  */
 export const buildDateRangeFilter = (
-  createdBefore?: Date,
-  createdAfter?: Date,
-  fieldName: string = 'createdAt'
-): Record<string, any> => {
-  const dateFilter: Record<string, any> = {};
+	createdBefore?: Date,
+	createdAfter?: Date,
+	fieldName = "createdAt",
+): FilterQuery<unknown> => {
+	const dateFilter: DateRangeOperator = {};
 
-  if (createdBefore) {
-    // Include all of the day of createdBefore by setting time to end of day
-    const endOfDay = new Date(createdBefore);
-    endOfDay.setHours(23, 59, 59, 999);
-    dateFilter.$lte = endOfDay;
-  }
+	if (createdBefore) {
+		// Include all of the day of createdBefore by setting time to end of day
+		const endOfDay = new Date(createdBefore);
+		endOfDay.setHours(23, 59, 59, 999);
+		dateFilter.$lte = endOfDay;
+	}
 
-  if (createdAfter) {
-    dateFilter.$gte = createdAfter;
-  }
+	if (createdAfter) {
+		dateFilter.$gte = createdAfter;
+	}
 
-  return Object.keys(dateFilter).length > 0 ? { [fieldName]: dateFilter } : {};
+	return Object.keys(dateFilter).length > 0 ? { [fieldName]: dateFilter } : {};
 };
 
 /**
@@ -53,50 +63,52 @@ export const buildDateRangeFilter = (
  * Searches across multiple text fields (case-insensitive)
  */
 export const buildSearchFilter = (
-  search: string | undefined,
-  searchFields: string[]
-): Record<string, any> => {
-  if (!search || searchFields.length === 0) {
-    return {};
-  }
+	search: string | undefined,
+	searchFields: string[],
+): FilterQuery<unknown> => {
+	if (!search || searchFields.length === 0) {
+		return {};
+	}
 
-  const searchRegex = new RegExp(search, 'i');
-  return {
-    $or: searchFields.map((field) => ({
-      [field]: searchRegex,
-    })),
-  };
+	const searchRegex = new RegExp(search, "i");
+	return {
+		$or: searchFields.map((field) => ({
+			[field]: searchRegex,
+		})),
+	};
 };
 
 /**
  * Merge multiple filter objects into a single MongoDB filter
  */
-export const mergeFilters = (...filters: Record<string, any>[]): Record<string, any> => {
-  const mergedFilter: Record<string, any> = {};
-  const conditions: any[] = [];
+export const mergeFilters = (
+	...filters: FilterQuery<unknown>[]
+): FilterQuery<unknown> => {
+	const mergedFilter: FilterQuery<unknown> = {};
+	const conditions: FilterQuery<unknown>[] = [];
 
-  for (const filter of filters) {
-    if (Object.keys(filter).length === 0) continue;
+	for (const filter of filters) {
+		if (Object.keys(filter).length === 0) continue;
 
-    // If filter has $or, add it to conditions
-    if (filter.$or) {
-      conditions.push({ $or: filter.$or });
-      continue;
-    }
+		// If filter has $or, add it to conditions
+		if (filter.$or) {
+			conditions.push({ $or: filter.$or });
+			continue;
+		}
 
-    // Otherwise merge directly
-    Object.assign(mergedFilter, filter);
-  }
+		// Otherwise merge directly
+		Object.assign(mergedFilter, filter);
+	}
 
-  // If we have conditions, wrap everything in $and
-  if (conditions.length > 0) {
-    const baseConditions = Object.keys(mergedFilter).map((key) => ({
-      [key]: mergedFilter[key],
-    }));
-    return {
-      $and: [...baseConditions, ...conditions],
-    };
-  }
+	// If we have conditions, wrap everything in $and
+	if (conditions.length > 0) {
+		const baseConditions = Object.keys(mergedFilter).map((key) => ({
+			[key]: mergedFilter[key as keyof typeof mergedFilter],
+		}));
+		return {
+			$and: [...baseConditions, ...conditions],
+		};
+	}
 
-  return mergedFilter;
+	return mergedFilter;
 };

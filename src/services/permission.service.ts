@@ -1,7 +1,12 @@
-import { PermissionRepository } from '../repositories/permission.repository';
-import { PermissionCreateInput, PermissionUpdateInput } from '../models/permission.model';
-import { NotFoundError, ConflictError } from '../utils/errors.util';
-import { calculateSkip } from '../utils/pagination.util';
+import { PermissionRepository } from "../repositories/permission.repository";
+import type {
+	PermissionCreateInput,
+	PermissionUpdateInput,
+} from "../models/permission.model";
+import type { Permission } from "../models/permission.model";
+import { NotFoundError, ConflictError } from "../utils/errors.util";
+import { calculateSkip } from "../utils/pagination.util";
+import type { FilterQuery } from "mongoose";
 
 /**
  * Permission Service - Business logic layer for Permission
@@ -30,18 +35,24 @@ export class PermissionService {
     return permission;
   }
 
-  async getAllPermissions(
-    page: number = 1,
-    limit: number = 10,
-    sortBy?: string,
-    sortOrder?: 'asc' | 'desc',
-    filter: Record<string, any> = {}
-  ) {
-    const skip = calculateSkip(page, limit);
-    const permissions = await this.repository.findAll(skip, limit, sortBy, sortOrder, filter);
-    const total = await this.repository.count(filter);
-    return { permissions, total };
-  }
+	async getAllPermissions(
+		page = 1,
+		limit = 10,
+		sortBy?: string,
+		sortOrder?: "asc" | "desc",
+		filter: FilterQuery<Permission> = {},
+	) {
+		const skip = calculateSkip(page, limit);
+		const permissions = await this.repository.findAll(
+			skip,
+			limit,
+			sortBy,
+			sortOrder,
+			filter,
+		);
+		const total = await this.repository.count(filter);
+		return { permissions, total };
+	}
 
   async updatePermission(id: string, data: PermissionUpdateInput) {
     if (data.name) {

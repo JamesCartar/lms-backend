@@ -1,4 +1,4 @@
-import { prop, getModelForClass, Ref } from '@typegoose/typegoose';
+import { prop, getModelForClass, type Ref } from '@typegoose/typegoose';
 import { z } from 'zod';
 import { createStringSchema, createArraySchema, createObjectIdSchema } from '../utils/schema.util';
 import { Permission } from './permission.model';

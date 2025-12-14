@@ -3,12 +3,12 @@
  * Extends Express Request interface to include validated query types
  */
 
-import { AdminFilterQuery } from '../filters/admin.filter';
-import { AuditLogFilterQuery } from '../filters/auditlog.filter';
-import { PermissionFilterQuery } from '../filters/permission.filter';
-import { RoleFilterQuery } from '../filters/role.filter';
-import { StudentFilterQuery } from '../filters/student.filter';
-import { UserLogFilterQuery } from '../filters/userlog.filter';
+import type { AdminFilterQuery } from '../filters/admin.filter';
+import type { AuditLogFilterQuery } from '../filters/auditlog.filter';
+import type { PermissionFilterQuery } from '../filters/permission.filter';
+import type { RoleFilterQuery } from '../filters/role.filter';
+import type { StudentFilterQuery } from '../filters/student.filter';
+import type { UserLogFilterQuery } from '../filters/userlog.filter';
 
 /**
  * Union type of all possible filter queries
@@ -31,5 +31,3 @@ declare global {
     }
   }
 }
-
-export {};

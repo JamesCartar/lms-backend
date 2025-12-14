@@ -3,9 +3,9 @@
  * Used for strongly typing populated Mongoose documents with Typegoose
  */
 
-import { DocumentType } from '@typegoose/typegoose';
-import { Role } from '../models/role.model';
-import { Permission } from '../models/permission.model';
+import type { DocumentType } from '@typegoose/typegoose';
+import type { Role } from '../models/role.model';
+import type { Permission } from '../models/permission.model';
 
 /**
  * Represents a Role with populated permissions

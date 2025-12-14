@@ -3,7 +3,7 @@
  * These provide consistent error handling across the application
  */
 
-import { ValidationErrors } from '../types/validation.types';
+import type { ValidationErrors } from '../types/validation.types';
 
 /**
  * Base Application Error

@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from '../utils/errors.util';
-import { JwtPayload } from '../types/jwt.types';
+import type { JwtPayload } from '../types/jwt.types';
 
 /**
  * Authentication Middleware
@@ -77,15 +77,15 @@ export const optionalAuthenticate = async (
     const jwtSecret = process.env.JWT_SECRET;
     
     if (!jwtSecret) {
-      throw new Error('JWT_SECRET is not configured');
-    }
+		throw new Error("JWT_SECRET is not configured");
+	}
 
-    const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
-    req.jwt = decoded;
+	const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+	req.jwt = decoded;
 
-    next();
-  } catch (error) {
-    // Silently continue without authentication
-    next();
-  }
+	next();
+} catch (_error) {
+	// Silently continue without authentication
+	next();
+}
 };

@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
-import { DocumentType } from '@typegoose/typegoose';
-import { PermissionModel, Permission } from '../models/permission.model';
-import { RoleModel, Role } from '../models/role.model';
+import type { DocumentType } from '@typegoose/typegoose';
+import { PermissionModel, type Permission } from '../models/permission.model';
+import { RoleModel, type Role } from '../models/role.model';
 import { StudentModel } from '../models/student.model';
 import { AdminModel } from '../models/admin.model';
 import { permissionSeeds } from './permission.seed';

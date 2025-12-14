@@ -1,5 +1,6 @@
-import { prop, getModelForClass } from '@typegoose/typegoose';
-import { Types } from 'mongoose';
+import { prop, getModelForClass } from "@typegoose/typegoose";
+import { Types } from "mongoose";
+import type { AuditLogChanges } from "../types/mongodb.types";
 
 /**
  * AuditLog Model - Tracks user actions and resource changes
@@ -24,8 +25,8 @@ export class AuditLog {
   @prop({ type: () => Types.ObjectId })
   public resourceId?: Types.ObjectId;
 
-  @prop({ type: () => Object })
-  public changes?: Record<string, any>;
+	@prop({ type: () => Object })
+	public changes?: AuditLogChanges;
 
   @prop({ trim: true })
   public ip?: string;
