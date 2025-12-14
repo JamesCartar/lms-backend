@@ -1,5 +1,6 @@
 import { StudentRepository } from '../repositories/student.repository';
 import { StudentCreateInput, StudentUpdateInput } from '../models/student.model';
+import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
 
 /**
  * Student Service - Business logic layer for Student
@@ -14,12 +15,12 @@ export class StudentService {
   async createStudent(data: StudentCreateInput) {
     // Validation ensures required fields exist, but TypeScript doesn't know that
     if (!data.email || !data.firstName || !data.lastName || !data.password) {
-      throw new Error('Email, firstName, lastName, and password are required');
+      throw new BadRequestError('Email, firstName, lastName, and password are required');
     }
     
     const existing = await this.repository.findByEmail(data.email);
     if (existing) {
-      throw new Error('Student with this email already exists');
+      throw new ConflictError('Student with this email already exists');
     }
 
     // In production, password should be hashed here
@@ -29,7 +30,7 @@ export class StudentService {
   async getStudentById(id: string) {
     const student = await this.repository.findById(id);
     if (!student) {
-      throw new Error('Student not found');
+      throw new NotFoundError('Student not found');
     }
     return student;
   }
@@ -46,14 +47,14 @@ export class StudentService {
     if (data.email) {
       const existing = await this.repository.findByEmail(data.email);
       if (existing && existing._id.toString() !== id) {
-        throw new Error('Student with this email already exists');
+        throw new ConflictError('Student with this email already exists');
       }
     }
 
     // In production, password should be hashed here if provided
     const student = await this.repository.update(id, data);
     if (!student) {
-      throw new Error('Student not found');
+      throw new NotFoundError('Student not found');
     }
     return student;
   }
@@ -61,7 +62,7 @@ export class StudentService {
   async deleteStudent(id: string) {
     const student = await this.repository.delete(id);
     if (!student) {
-      throw new Error('Student not found');
+      throw new NotFoundError('Student not found');
     }
     return student;
   }

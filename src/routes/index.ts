@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import authRoutes from './auth.routes';
 import permissionRoutes from './permission.routes';
 import roleRoutes from './role.routes';
 import adminRoutes from './admin.routes';
@@ -9,6 +10,7 @@ import studentRoutes from './student.routes';
  */
 const router = Router();
 
+router.use('/auth', authRoutes);
 router.use('/permissions', permissionRoutes);
 router.use('/roles', roleRoutes);
 router.use('/admins', adminRoutes);

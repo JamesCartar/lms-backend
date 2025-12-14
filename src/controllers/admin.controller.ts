@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { AdminService } from '../services/admin.service';
+import { sendSuccessResponse } from '../utils/response.util';
+import { asyncHandler } from '../middleware/error.middleware';
 
 /**
  * Admin Controller - Handles HTTP requests for Admin
@@ -11,80 +13,28 @@ export class AdminController {
     this.service = new AdminService();
   }
 
-  create = async (req: Request, res: Response) => {
-    try {
-      const admin = await this.service.createAdmin(req.body);
-      res.status(201).json({
-        success: true,
-        message: 'Admin created successfully',
-        data: admin,
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to create admin',
-      });
-    }
-  };
+  create = asyncHandler(async (req: Request, res: Response) => {
+    const admin = await this.service.createAdmin(req.body);
+    sendSuccessResponse(res, admin, 'Admin created successfully', 201);
+  });
 
-  getById = async (req: Request, res: Response) => {
-    try {
-      const admin = await this.service.getAdminById(req.params.id);
-      res.status(200).json({
-        success: true,
-        data: admin,
-      });
-    } catch (error) {
-      res.status(404).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Admin not found',
-      });
-    }
-  };
+  getById = asyncHandler(async (req: Request, res: Response) => {
+    const admin = await this.service.getAdminById(req.params.id);
+    sendSuccessResponse(res, admin);
+  });
 
-  getAll = async (req: Request, res: Response) => {
-    try {
-      const admins = await this.service.getAllAdmins();
-      res.status(200).json({
-        success: true,
-        data: admins,
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to fetch admins',
-      });
-    }
-  };
+  getAll = asyncHandler(async (req: Request, res: Response) => {
+    const admins = await this.service.getAllAdmins();
+    sendSuccessResponse(res, admins);
+  });
 
-  update = async (req: Request, res: Response) => {
-    try {
-      const admin = await this.service.updateAdmin(req.params.id, req.body);
-      res.status(200).json({
-        success: true,
-        message: 'Admin updated successfully',
-        data: admin,
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to update admin',
-      });
-    }
-  };
+  update = asyncHandler(async (req: Request, res: Response) => {
+    const admin = await this.service.updateAdmin(req.params.id, req.body);
+    sendSuccessResponse(res, admin, 'Admin updated successfully');
+  });
 
-  delete = async (req: Request, res: Response) => {
-    try {
-      await this.service.deleteAdmin(req.params.id);
-      res.status(200).json({
-        success: true,
-        message: 'Admin deleted successfully',
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Failed to delete admin',
-      });
-    }
-  };
+  delete = asyncHandler(async (req: Request, res: Response) => {
+    await this.service.deleteAdmin(req.params.id);
+    sendSuccessResponse(res, null, 'Admin deleted successfully');
+  });
 }
