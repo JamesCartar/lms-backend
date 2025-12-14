@@ -1,7 +1,7 @@
 import { RoleRepository } from '../repositories/role.repository';
 import { PermissionRepository } from '../repositories/permission.repository';
 import { RoleCreateInput, RoleUpdateInput } from '../models/role.model';
-import { NotFoundError, ConflictError } from '../utils/errors.util';
+import { NotFoundError, ConflictError, BadRequestError } from '../utils/errors.util';
 import { calculateSkip } from '../utils/pagination.util';
 import { Ref } from '@typegoose/typegoose';
 import { Permission } from '../models/permission.model';
@@ -62,6 +62,11 @@ export class RoleService {
     return { roles, total };
   }
 
+  async getAllRoleNames() {
+    const roles = await this.repository.findAllNames();
+    return roles;
+  }
+
   async updateRole(id: string, data: RoleUpdateInput) {
     if (data.name) {
       const existing = await this.repository.findByName(data.name);
@@ -91,10 +96,16 @@ export class RoleService {
   }
 
   async deleteRole(id: string) {
-    const role = await this.repository.delete(id);
+    const role = await this.repository.findById(id);
     if (!role) {
       throw new NotFoundError('Role not found');
     }
-    return role;
+    
+    // Prevent deletion of system roles
+    if (role.type === 'system') {
+      throw new BadRequestError('System roles cannot be deleted');
+    }
+    
+    return await this.repository.delete(id);
   }
 }

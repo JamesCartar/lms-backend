@@ -7,6 +7,7 @@ export const roleSeeds = [
   {
     name: 'Super Admin',
     description: 'Full system access with all permissions',
+    type: 'system',
     permissions: [
       'admin.create',
       'admin.read',
@@ -29,6 +30,7 @@ export const roleSeeds = [
   {
     name: 'Admin',
     description: 'Administrative access with limited permissions',
+    type: 'system',
     permissions: [
       'admin.read',
       'role.read',
@@ -42,6 +44,7 @@ export const roleSeeds = [
   {
     name: 'Manager',
     description: 'Can manage students and view system data',
+    type: 'system',
     permissions: [
       'student.create',
       'student.read',
@@ -53,6 +56,7 @@ export const roleSeeds = [
   {
     name: 'Viewer',
     description: 'Read-only access to system data',
+    type: 'system',
     permissions: [
       'admin.read',
       'role.read',

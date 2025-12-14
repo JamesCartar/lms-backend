@@ -10,11 +10,15 @@ export class RoleRepository {
   }
 
   async findById(id: string): Promise<DocumentType<Role> | null> {
-    return await RoleModel.findById(id).populate('permissions');
+    return await RoleModel.findById(id)
+      .select('name description type permissions createdAt updatedAt')
+      .populate('permissions');
   }
 
   async findByName(name: string): Promise<DocumentType<Role> | null> {
-    return await RoleModel.findOne({ name }).populate('permissions');
+    return await RoleModel.findOne({ name })
+      .select('name description type permissions createdAt updatedAt')
+      .populate('permissions');
   }
 
   async findAll(
@@ -29,10 +33,17 @@ export class RoleRepository {
     };
     
     return await RoleModel.find(filter)
+      .select('name description type permissions createdAt updatedAt')
       .populate('permissions')
       .sort(sortObj)
       .skip(skip)
       .limit(limit);
+  }
+
+  async findAllNames(): Promise<DocumentType<Role>[]> {
+    return await RoleModel.find()
+      .select('name')
+      .sort({ name: 1 });
   }
 
   async count(filter: Record<string, any> = {}): Promise<number> {
@@ -40,7 +51,9 @@ export class RoleRepository {
   }
 
   async update(id: string, data: Partial<Role>): Promise<DocumentType<Role> | null> {
-    return await RoleModel.findByIdAndUpdate(id, data, { new: true }).populate('permissions');
+    return await RoleModel.findByIdAndUpdate(id, data, { new: true })
+      .select('name description type permissions createdAt updatedAt')
+      .populate('permissions');
   }
 
   async delete(id: string): Promise<DocumentType<Role> | null> {
