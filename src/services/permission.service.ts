@@ -12,7 +12,12 @@ export class PermissionService {
   }
 
   async createPermission(data: PermissionCreateInput) {
-    const existing = await this.repository.findByName(data.name!);
+    // Validation ensures name exists, but TypeScript doesn't know that
+    if (!data.name || !data.resource || !data.action) {
+      throw new Error('Name, resource, and action are required');
+    }
+    
+    const existing = await this.repository.findByName(data.name);
     if (existing) {
       throw new Error('Permission with this name already exists');
     }

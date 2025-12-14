@@ -15,7 +15,12 @@ export class RoleService {
   }
 
   async createRole(data: RoleCreateInput) {
-    const existing = await this.repository.findByName(data.name!);
+    // Validation ensures name exists, but TypeScript doesn't know that
+    if (!data.name) {
+      throw new Error('Name is required');
+    }
+    
+    const existing = await this.repository.findByName(data.name);
     if (existing) {
       throw new Error('Role with this name already exists');
     }
@@ -28,7 +33,11 @@ export class RoleService {
       }
     }
 
-    return await this.repository.create(data as any);
+    return await this.repository.create({
+      name: data.name,
+      description: data.description,
+      permissions: data.permissions as any,
+    });
   }
 
   async getRoleById(id: string) {
@@ -59,7 +68,11 @@ export class RoleService {
       }
     }
 
-    const role = await this.repository.update(id, data as any);
+    const role = await this.repository.update(id, {
+      name: data.name,
+      description: data.description,
+      permissions: data.permissions as any,
+    });
     if (!role) {
       throw new Error('Role not found');
     }

@@ -12,7 +12,12 @@ export class StudentService {
   }
 
   async createStudent(data: StudentCreateInput) {
-    const existing = await this.repository.findByEmail(data.email!);
+    // Validation ensures required fields exist, but TypeScript doesn't know that
+    if (!data.email || !data.firstName || !data.lastName || !data.password) {
+      throw new Error('Email, firstName, lastName, and password are required');
+    }
+    
+    const existing = await this.repository.findByEmail(data.email);
     if (existing) {
       throw new Error('Student with this email already exists');
     }

@@ -15,7 +15,12 @@ export class AdminService {
   }
 
   async createAdmin(data: AdminCreateInput) {
-    const existing = await this.repository.findByEmail(data.email!);
+    // Validation ensures required fields exist, but TypeScript doesn't know that
+    if (!data.email || !data.name || !data.password) {
+      throw new Error('Email, name, and password are required');
+    }
+    
+    const existing = await this.repository.findByEmail(data.email);
     if (existing) {
       throw new Error('Admin with this email already exists');
     }
@@ -29,7 +34,13 @@ export class AdminService {
     }
 
     // In production, password should be hashed here
-    return await this.repository.create(data as any);
+    return await this.repository.create({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      role: data.role as any,
+      isActive: data.isActive,
+    });
   }
 
   async getAdminById(id: string) {
@@ -61,7 +72,13 @@ export class AdminService {
     }
 
     // In production, password should be hashed here if provided
-    const admin = await this.repository.update(id, data as any);
+    const admin = await this.repository.update(id, {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      role: data.role as any,
+      isActive: data.isActive,
+    });
     if (!admin) {
       throw new Error('Admin not found');
     }
