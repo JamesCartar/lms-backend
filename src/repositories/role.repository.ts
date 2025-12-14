@@ -40,9 +40,13 @@ export class RoleRepository {
       .limit(limit);
   }
 
+  async findByIdLight(id: string): Promise<any> {
+    return await RoleModel.findById(id).select('_id type');
+  }
+
   async findAllNames(): Promise<DocumentType<Role>[]> {
     return await RoleModel.find()
-      .select('name')
+      .select('_id name')
       .sort({ name: 1 });
   }
 

@@ -98,7 +98,8 @@ export class RoleService {
   }
 
   async deleteRole(id: string) {
-    const role = await this.repository.findById(id);
+    // Use lighter query to check role existence and type
+    const role = await this.repository.findByIdLight(id);
     if (!role) {
       throw new NotFoundError('Role not found');
     }
@@ -108,6 +109,7 @@ export class RoleService {
       throw new BadRequestError('System roles cannot be deleted');
     }
     
-    return await this.repository.delete(id);
+    const deletedRole = await this.repository.delete(id);
+    return deletedRole;
   }
 }
