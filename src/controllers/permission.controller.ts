@@ -3,6 +3,7 @@ import { PermissionService } from '../services/permission.service';
 import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
 import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
+import { getIdParam } from '../utils/params.util';
 
 /**
  * Permission Controller - Handles HTTP requests for Permission
@@ -20,7 +21,7 @@ export class PermissionController {
   });
 
   getById = asyncHandler(async (req: Request, res: Response) => {
-    const permission = await this.service.getPermissionById(req.params.id);
+    const permission = await this.service.getPermissionById(getIdParam(req));
     sendSuccessResponse(res, permission);
   });
 
@@ -32,12 +33,12 @@ export class PermissionController {
   });
 
   update = asyncHandler(async (req: Request, res: Response) => {
-    const permission = await this.service.updatePermission(req.params.id, req.body);
+    const permission = await this.service.updatePermission(getIdParam(req), req.body);
     sendSuccessResponse(res, permission, 'Permission updated successfully');
   });
 
   delete = asyncHandler(async (req: Request, res: Response) => {
-    await this.service.deletePermission(req.params.id);
+    await this.service.deletePermission(getIdParam(req));
     sendSuccessResponse(res, null, 'Permission deleted successfully');
   });
 }

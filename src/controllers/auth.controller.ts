@@ -3,12 +3,11 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { AdminModel } from '../models/admin.model';
 import { StudentModel } from '../models/student.model';
-import { RoleModel } from '../models/role.model';
-import { PermissionModel } from '../models/permission.model';
 import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
 import { UnauthorizedError, BadRequestError } from '../utils/errors.util';
 import { UserLogService } from '../services/userlog.service';
+import { PopulatedRole, hasPermissionDocuments } from '../types/populated.types';
 
 /**
  * Auth Controller - Handles authentication and login
@@ -54,10 +53,10 @@ export class AuthController {
     // Get permissions from role
     const permissions: string[] = [];
     if (admin.role && typeof admin.role === 'object') {
-      const role = admin.role as any;
-      if (role.permissions && Array.isArray(role.permissions)) {
-        role.permissions.forEach((perm: any) => {
-          if (typeof perm === 'object' && perm.name) {
+      const role = admin.role as PopulatedRole;
+      if (role.permissions && hasPermissionDocuments(role.permissions)) {
+        role.permissions.forEach((perm) => {
+          if (perm.name) {
             permissions.push(perm.name);
           }
         });
@@ -74,7 +73,7 @@ export class AuthController {
       {
         id: admin._id.toString(),
         email: admin.email,
-        role: admin.role && typeof admin.role === 'object' ? (admin.role as any).name : undefined,
+        role: admin.role && typeof admin.role === 'object' ? (admin.role as PopulatedRole).name : undefined,
         permissions,
         type: 'admin',
       },

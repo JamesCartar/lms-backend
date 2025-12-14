@@ -6,7 +6,7 @@ import { ForbiddenError, UnauthorizedError } from '../utils/errors.util';
  * Verifies that the authenticated user has the required permissions
  */
 export const checkPermission = (...requiredPermissions: string[]) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     try {
       // Check if user is authenticated
       if (!req.jwt) {
@@ -38,7 +38,7 @@ export const checkPermission = (...requiredPermissions: string[]) => {
  * Check if user has ALL specified permissions
  */
 export const checkAllPermissions = (...requiredPermissions: string[]) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     try {
       if (!req.jwt) {
         throw new UnauthorizedError('Authentication required');
@@ -67,7 +67,7 @@ export const checkAllPermissions = (...requiredPermissions: string[]) => {
  * Check if user has a specific role
  */
 export const checkRole = (...allowedRoles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     try {
       if (!req.jwt) {
         throw new UnauthorizedError('Authentication required');
@@ -91,7 +91,7 @@ export const checkRole = (...allowedRoles: string[]) => {
 /**
  * Check if user is admin type
  */
-export const isAdmin = (req: Request, res: Response, next: NextFunction): void => {
+export const isAdmin = (req: Request, _res: Response, next: NextFunction): void => {
   try {
     if (!req.jwt) {
       throw new UnauthorizedError('Authentication required');
@@ -110,7 +110,7 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction): void =
 /**
  * Check if user is student type
  */
-export const isStudent = (req: Request, res: Response, next: NextFunction): void => {
+export const isStudent = (req: Request, _res: Response, next: NextFunction): void => {
   try {
     if (!req.jwt) {
       throw new UnauthorizedError('Authentication required');

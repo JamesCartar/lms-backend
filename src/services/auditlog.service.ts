@@ -1,6 +1,5 @@
 import { AuditLogRepository } from '../repositories/auditlog.repository';
 import { NotFoundError } from '../utils/errors.util';
-import { AuditLog } from '../models/auditlog.model';
 import { Types } from 'mongoose';
 import { calculateSkip } from '../utils/pagination.util';
 

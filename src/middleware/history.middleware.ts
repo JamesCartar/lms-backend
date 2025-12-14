@@ -2,6 +2,15 @@ import { Request, Response, NextFunction } from 'express';
 import { AuditLogService } from '../services/auditlog.service';
 
 /**
+ * Response data structure that may contain an ID
+ */
+interface ResponseData {
+  data?: {
+    _id?: unknown;
+  };
+}
+
+/**
  * Save History Middleware
  * Records audit logs for POST, PUT, DELETE operations
  * Should be applied after authentication middleware
@@ -12,7 +21,7 @@ export const saveHistory = (resource: string) => {
     const originalSend = res.json;
     
     // Override send function to capture response
-    res.json = function (data: any) {
+    res.json = function (data: ResponseData) {
       // Only log if the request was successful (2xx status code)
       if (res.statusCode >= 200 && res.statusCode < 300 && req.jwt) {
         const auditLogService = new AuditLogService();

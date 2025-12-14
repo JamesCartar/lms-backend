@@ -1,8 +1,8 @@
 import 'dotenv/config';
-import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { PermissionModel } from '../models/permission.model';
-import { RoleModel } from '../models/role.model';
+import { DocumentType } from '@typegoose/typegoose';
+import { PermissionModel, Permission } from '../models/permission.model';
+import { RoleModel, Role } from '../models/role.model';
 import { StudentModel } from '../models/student.model';
 import { AdminModel } from '../models/admin.model';
 import { permissionSeeds } from './permission.seed';
@@ -30,7 +30,7 @@ const seedPermissions = async () => {
   return permissions;
 };
 
-const seedRoles = async (permissions: any[]) => {
+const seedRoles = async (permissions: DocumentType<Permission>[]) => {
   console.log('Seeding roles...');
   
   // Clear existing roles
@@ -42,11 +42,11 @@ const seedRoles = async (permissions: any[]) => {
   );
   
   // Insert roles with permission IDs
-  const roles = [];
+  const roles: DocumentType<Role>[] = [];
   for (const roleSeed of roleSeeds) {
     const permissionIds = roleSeed.permissions
       .map(permName => permissionMap.get(permName))
-      .filter(id => id !== undefined);
+      .filter((id): id is string => id !== undefined);
     
     const role = await RoleModel.create({
       name: roleSeed.name,
@@ -82,7 +82,7 @@ const seedStudents = async () => {
   return students;
 };
 
-const seedAdmin = async (roles: any[]) => {
+const seedAdmin = async (roles: DocumentType<Role>[]) => {
   console.log('Seeding admin user...');
   
   // Clear existing admins

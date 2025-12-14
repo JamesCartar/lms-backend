@@ -3,6 +3,7 @@ import { RoleService } from '../services/role.service';
 import { sendSuccessResponse } from '../utils/response.util';
 import { asyncHandler } from '../middleware/error.middleware';
 import { getPaginationParams, calculatePaginationMeta } from '../utils/pagination.util';
+import { getIdParam } from '../utils/params.util';
 
 /**
  * Role Controller - Handles HTTP requests for Role
@@ -20,7 +21,7 @@ export class RoleController {
   });
 
   getById = asyncHandler(async (req: Request, res: Response) => {
-    const role = await this.service.getRoleById(req.params.id);
+    const role = await this.service.getRoleById(getIdParam(req));
     sendSuccessResponse(res, role);
   });
 
@@ -32,12 +33,12 @@ export class RoleController {
   });
 
   update = asyncHandler(async (req: Request, res: Response) => {
-    const role = await this.service.updateRole(req.params.id, req.body);
+    const role = await this.service.updateRole(getIdParam(req), req.body);
     sendSuccessResponse(res, role, 'Role updated successfully');
   });
 
   delete = asyncHandler(async (req: Request, res: Response) => {
-    await this.service.deleteRole(req.params.id);
+    await this.service.deleteRole(getIdParam(req));
     sendSuccessResponse(res, null, 'Role deleted successfully');
   });
 }

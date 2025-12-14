@@ -9,7 +9,7 @@ import { JwtPayload } from '../types/jwt.types';
  */
 export const authenticate = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
@@ -39,7 +39,6 @@ export const authenticate = async (
 
     // Attach decoded payload to request
     req.jwt = decoded;
-    req.user = decoded; // Also set user for compatibility
 
     next();
   } catch (error) {
@@ -59,7 +58,7 @@ export const authenticate = async (
  */
 export const optionalAuthenticate = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
@@ -83,7 +82,6 @@ export const optionalAuthenticate = async (
 
     const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
     req.jwt = decoded;
-    req.user = decoded;
 
     next();
   } catch (error) {
