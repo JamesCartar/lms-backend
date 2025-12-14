@@ -34,7 +34,7 @@ export const sendSuccessResponse = <T = unknown>(
   pagination?: PaginationMeta
 ): Response => {
   const responseData = pagination 
-    ? { items: data, pagination } as PaginatedData<T>
+    ? { items: data, pagination }
     : data;
 
   const response: ApiResponse<typeof responseData> = {
@@ -63,7 +63,7 @@ export const sendSuccessResponseWithResource = <T = unknown>(
   const wrappedData: WrappedData = { [resourceKey]: data };
   
   const responseData = pagination 
-    ? { items: wrappedData, pagination } as PaginatedData<WrappedData>
+    ? { items: wrappedData, pagination }
     : wrappedData;
 
   const response: ApiResponse<typeof responseData> = {
