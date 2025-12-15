@@ -109,25 +109,6 @@ export function createObjectIdSchema(
 	return required ? schema : schema.optional();
 }
 
-export function createEnumSchema<T extends [string, ...string[]]>(
-	values: T,
-	required: true,
-	// biome-ignore lint/suspicious/noExplicitAny: TypeScript has limitations with Zod v4 enum types
-): any;
-export function createEnumSchema<T extends [string, ...string[]]>(
-	values: T,
-	required: false,
-	// biome-ignore lint/suspicious/noExplicitAny: TypeScript has limitations with Zod v4 enum types
-): any;
-export function createEnumSchema<T extends [string, ...string[]]>(
-	values: T,
-	required: boolean = true,
-	// biome-ignore lint/suspicious/noExplicitAny: TypeScript has limitations with Zod v4 enum types
-): any {
-	const schema = z.enum(values);
-	return required ? schema : schema.optional();
-}
-
 /**
  * Converts a string ObjectId to a Mongoose Types.ObjectId
  * This is useful when passing validated Zod input to Mongoose/Typegoose
