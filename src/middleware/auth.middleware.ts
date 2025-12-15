@@ -1,55 +1,55 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { UnauthorizedError } from '../utils/errors.util';
-import { JwtPayload } from '../types/jwt.types';
+import type { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { UnauthorizedError } from "../utils/errors.util";
+import type { JwtPayload } from "../types/jwt.types";
 
 /**
  * Authentication Middleware
  * Validates JWT token from Authorization header and attaches payload to request
  */
 export const authenticate = async (
-  req: Request,
-  _res: Response,
-  next: NextFunction
+	req: Request,
+	_res: Response,
+	next: NextFunction,
 ): Promise<void> => {
-  try {
-    // Get token from Authorization header
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedError('No token provided. Please authenticate.');
-    }
+	try {
+		// Get token from Authorization header
+		const authHeader = req.headers.authorization;
 
-    // Extract token
-    const token = authHeader.split(' ')[1];
-    
-    if (!token) {
-      throw new UnauthorizedError('Invalid token format');
-    }
+		if (!authHeader || !authHeader.startsWith("Bearer ")) {
+			throw new UnauthorizedError("No token provided. Please authenticate.");
+		}
 
-    // Get JWT secret from environment
-    const jwtSecret = process.env.JWT_SECRET;
-    
-    if (!jwtSecret) {
-      throw new Error('JWT_SECRET is not configured');
-    }
+		// Extract token
+		const token = authHeader.split(" ")[1];
 
-    // Verify token
-    const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+		if (!token) {
+			throw new UnauthorizedError("Invalid token format");
+		}
 
-    // Attach decoded payload to request
-    req.jwt = decoded;
+		// Get JWT secret from environment
+		const jwtSecret = process.env.JWT_SECRET;
 
-    next();
-  } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      next(new UnauthorizedError('Invalid token'));
-    } else if (error instanceof jwt.TokenExpiredError) {
-      next(new UnauthorizedError('Token expired'));
-    } else {
-      next(error);
-    }
-  }
+		if (!jwtSecret) {
+			throw new Error("JWT_SECRET is not configured");
+		}
+
+		// Verify token
+		const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+
+		// Attach decoded payload to request
+		req.jwt = decoded;
+
+		next();
+	} catch (error) {
+		if (error instanceof jwt.JsonWebTokenError) {
+			next(new UnauthorizedError("Invalid token"));
+		} else if (error instanceof jwt.TokenExpiredError) {
+			next(new UnauthorizedError("Token expired"));
+		} else {
+			next(error);
+		}
+	}
 };
 
 /**
@@ -57,35 +57,35 @@ export const authenticate = async (
  * Useful for endpoints that work with or without authentication
  */
 export const optionalAuthenticate = async (
-  req: Request,
-  _res: Response,
-  next: NextFunction
+	req: Request,
+	_res: Response,
+	next: NextFunction,
 ): Promise<void> => {
-  try {
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return next();
-    }
+	try {
+		const authHeader = req.headers.authorization;
 
-    const token = authHeader.split(' ')[1];
-    
-    if (!token) {
-      return next();
-    }
+		if (!authHeader || !authHeader.startsWith("Bearer ")) {
+			return next();
+		}
 
-    const jwtSecret = process.env.JWT_SECRET;
-    
-    if (!jwtSecret) {
-      throw new Error('JWT_SECRET is not configured');
-    }
+		const token = authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
-    req.jwt = decoded;
+		if (!token) {
+			return next();
+		}
 
-    next();
-  } catch (error) {
-    // Silently continue without authentication
-    next();
-  }
+		const jwtSecret = process.env.JWT_SECRET;
+
+		if (!jwtSecret) {
+			throw new Error("JWT_SECRET is not configured");
+		}
+
+		const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+		req.jwt = decoded;
+
+		next();
+	} catch (_error) {
+		// Silently continue without authentication
+		next();
+	}
 };

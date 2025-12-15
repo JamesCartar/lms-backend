@@ -1,81 +1,86 @@
-import { AuditLogModel, AuditLog } from '../models/auditlog.model';
-import { DocumentType } from '@typegoose/typegoose';
-import { Types } from 'mongoose';
+import { AuditLogModel, type AuditLog } from "../models/auditlog.model";
+import type { DocumentType } from "@typegoose/typegoose";
+import { Types } from "mongoose";
+import type { MongoFilter } from "../utils/filter.util";
 
 /**
  * AuditLog Repository - Data access layer for AuditLog
  */
 export class AuditLogRepository {
-  async create(data: Partial<AuditLog>): Promise<DocumentType<AuditLog>> {
-    return await AuditLogModel.create(data);
-  }
+	async create(data: Partial<AuditLog>): Promise<DocumentType<AuditLog>> {
+		return await AuditLogModel.create(data);
+	}
 
-  async findById(id: string): Promise<DocumentType<AuditLog> | null> {
-    return await AuditLogModel.findById(id);
-  }
+	async findById(id: string): Promise<DocumentType<AuditLog> | null> {
+		return await AuditLogModel.findById(id);
+	}
 
-  async findAll(
-    skip: number,
-    limit: number,
-    sortBy: string = 'timestamp',
-    sortOrder: 'asc' | 'desc' = 'desc',
-    filter: Record<string, any> = {}
-  ): Promise<DocumentType<AuditLog>[]> {
-    const sortObj: Record<string, 1 | -1> = {
-      [sortBy]: sortOrder === 'asc' ? 1 : -1,
-    };
-    
-    return await AuditLogModel.find(filter)
-      .sort(sortObj)
-      .skip(skip)
-      .limit(limit);
-  }
+	async findAll(
+		skip: number,
+		limit: number,
+		sortBy: string = "timestamp",
+		sortOrder: "asc" | "desc" = "desc",
+		filter: MongoFilter = {},
+	): Promise<DocumentType<AuditLog>[]> {
+		const sortObj: Record<string, 1 | -1> = {
+			[sortBy]: sortOrder === "asc" ? 1 : -1,
+		};
 
-  async count(filter: Record<string, any> = {}): Promise<number> {
-    return await AuditLogModel.countDocuments(filter);
-  }
+		return await AuditLogModel.find(filter)
+			.sort(sortObj)
+			.skip(skip)
+			.limit(limit);
+	}
 
-  async findByUserId(
-    userId: string,
-    skip: number,
-    limit: number
-  ): Promise<DocumentType<AuditLog>[]> {
-    return await AuditLogModel.find({ userId: new Types.ObjectId(userId) })
-      .sort({ timestamp: -1 })
-      .skip(skip)
-      .limit(limit);
-  }
+	async count(filter: MongoFilter = {}): Promise<number> {
+		return await AuditLogModel.countDocuments(filter);
+	}
 
-  async countByUserId(userId: string): Promise<number> {
-    return await AuditLogModel.countDocuments({ userId: new Types.ObjectId(userId) });
-  }
+	async findByUserId(
+		userId: string,
+		skip: number,
+		limit: number,
+	): Promise<DocumentType<AuditLog>[]> {
+		return await AuditLogModel.find({ userId: new Types.ObjectId(userId) })
+			.sort({ timestamp: -1 })
+			.skip(skip)
+			.limit(limit);
+	}
 
-  async findByResource(
-    resource: string,
-    skip: number,
-    limit: number
-  ): Promise<DocumentType<AuditLog>[]> {
-    return await AuditLogModel.find({ resource })
-      .sort({ timestamp: -1 })
-      .skip(skip)
-      .limit(limit);
-  }
+	async countByUserId(userId: string): Promise<number> {
+		return await AuditLogModel.countDocuments({
+			userId: new Types.ObjectId(userId),
+		});
+	}
 
-  async countByResource(resource: string): Promise<number> {
-    return await AuditLogModel.countDocuments({ resource });
-  }
+	async findByResource(
+		resource: string,
+		skip: number,
+		limit: number,
+	): Promise<DocumentType<AuditLog>[]> {
+		return await AuditLogModel.find({ resource })
+			.sort({ timestamp: -1 })
+			.skip(skip)
+			.limit(limit);
+	}
 
-  async deleteAll(): Promise<number> {
-    const result = await AuditLogModel.deleteMany({});
-    return result.deletedCount || 0;
-  }
+	async countByResource(resource: string): Promise<number> {
+		return await AuditLogModel.countDocuments({ resource });
+	}
 
-  async deleteByUserId(userId: string): Promise<number> {
-    const result = await AuditLogModel.deleteMany({ userId: new Types.ObjectId(userId) });
-    return result.deletedCount || 0;
-  }
+	async deleteAll(): Promise<number> {
+		const result = await AuditLogModel.deleteMany({});
+		return result.deletedCount || 0;
+	}
 
-  async deleteById(id: string): Promise<DocumentType<AuditLog> | null> {
-    return await AuditLogModel.findByIdAndDelete(id);
-  }
+	async deleteByUserId(userId: string): Promise<number> {
+		const result = await AuditLogModel.deleteMany({
+			userId: new Types.ObjectId(userId),
+		});
+		return result.deletedCount || 0;
+	}
+
+	async deleteById(id: string): Promise<DocumentType<AuditLog> | null> {
+		return await AuditLogModel.findByIdAndDelete(id);
+	}
 }

@@ -1,13 +1,13 @@
-import { Request, Response, NextFunction } from 'express';
-import { AuditLogService } from '../services/auditlog.service';
+import type { Request, Response, NextFunction } from "express";
+import { AuditLogService } from "../services/auditlog.service";
 
 /**
  * Response data structure that may contain an ID
  */
 interface ResponseData {
-  data?: {
-    _id?: unknown;
-  };
+	data?: {
+		_id?: unknown;
+	};
 }
 
 /**
@@ -16,53 +16,55 @@ interface ResponseData {
  * Should be applied after authentication middleware
  */
 export const saveHistory = (resource: string) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    // Store original send function
-    const originalSend = res.json;
-    
-    // Override send function to capture response
-    res.json = function (data: ResponseData) {
-      // Only log if the request was successful (2xx status code)
-      if (res.statusCode >= 200 && res.statusCode < 300 && req.jwt) {
-        const auditLogService = new AuditLogService();
-        
-        // Determine action based on HTTP method
-        let action: 'CREATE' | 'UPDATE' | 'DELETE';
-        if (req.method === 'POST') {
-          action = 'CREATE';
-        } else if (req.method === 'PUT' || req.method === 'PATCH') {
-          action = 'UPDATE';
-        } else if (req.method === 'DELETE') {
-          action = 'DELETE';
-        } else {
-          // Skip logging for other methods
-          return originalSend.call(this, data);
-        }
+	return async (req: Request, res: Response, next: NextFunction) => {
+		// Store original send function
+		const originalSend = res.json;
 
-        // Get resource ID from params or response data
-        const resourceId = req.params.id || (data?.data?._id);
+		// Override send function to capture response
+		res.json = function (data: ResponseData) {
+			// Only log if the request was successful (2xx status code)
+			if (res.statusCode >= 200 && res.statusCode < 300 && req.jwt) {
+				const auditLogService = new AuditLogService();
 
-        // Create audit log asynchronously (don't block response)
-        auditLogService.createAuditLog({
-          userId: req.jwt.id,
-          userType: req.jwt.type,
-          email: req.jwt.email,
-          action,
-          resource,
-          resourceId: resourceId?.toString(),
-          changes: req.body,
-          ip: req.ip || req.socket.remoteAddress,
-          userAgent: req.get('user-agent'),
-        }).catch((error) => {
-          // Log error but don't fail the request
-          console.error('Failed to create audit log:', error);
-        });
-      }
+				// Determine action based on HTTP method
+				let action: "CREATE" | "UPDATE" | "DELETE";
+				if (req.method === "POST") {
+					action = "CREATE";
+				} else if (req.method === "PUT" || req.method === "PATCH") {
+					action = "UPDATE";
+				} else if (req.method === "DELETE") {
+					action = "DELETE";
+				} else {
+					// Skip logging for other methods
+					return originalSend.call(this, data);
+				}
 
-      // Call original send function
-      return originalSend.call(this, data);
-    };
+				// Get resource ID from params or response data
+				const resourceId = req.params.id || data?.data?._id;
 
-    next();
-  };
+				// Create audit log asynchronously (don't block response)
+				auditLogService
+					.createAuditLog({
+						userId: req.jwt.id,
+						userType: req.jwt.type,
+						email: req.jwt.email,
+						action,
+						resource,
+						resourceId: resourceId?.toString(),
+						changes: req.body,
+						ip: req.ip || req.socket.remoteAddress,
+						userAgent: req.get("user-agent"),
+					})
+					.catch((error) => {
+						// Log error but don't fail the request
+						console.error("Failed to create audit log:", error);
+					});
+			}
+
+			// Call original send function
+			return originalSend.call(this, data);
+		};
+
+		next();
+	};
 };
