@@ -38,16 +38,11 @@ export const RoleModel = getModelForClass(Role);
 export const RoleCreateSchema = z.object({
 	name: createStringSchema(true, 3, 50),
 	description: createStringSchema(false, 0, 200),
-	permissions: createArraySchema(createObjectIdSchema(), false),
+	permissions: createArraySchema(createObjectIdSchema(true), false),
 	type: z.enum(["system", "custom"]).optional(),
 });
 
-export const RoleUpdateSchema = z.object({
-	name: createStringSchema(false, 3, 50),
-	description: createStringSchema(false, 0, 200),
-	permissions: createArraySchema(createObjectIdSchema(), false),
-	type: z.enum(["system", "custom"]).optional(),
-});
+export const RoleUpdateSchema = RoleCreateSchema.partial();
 
 // Type inference from Zod schemas
 export type RoleCreateInput = z.infer<typeof RoleCreateSchema>;

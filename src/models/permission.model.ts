@@ -37,12 +37,7 @@ export const PermissionCreateSchema = z.object({
 	description: createStringSchema(false, 0, 200),
 });
 
-export const PermissionUpdateSchema = z.object({
-	name: createStringSchema(false, 3, 50),
-	resource: createStringSchema(false, 3, 50),
-	action: createStringSchema(false, 3, 50),
-	description: createStringSchema(false, 0, 200),
-});
+export const PermissionUpdateSchema = PermissionCreateSchema.partial();
 
 // Type inference from Zod schemas
 export type PermissionCreateInput = z.infer<typeof PermissionCreateSchema>;

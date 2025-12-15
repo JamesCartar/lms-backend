@@ -19,7 +19,7 @@ export class PermissionService {
 
 	async createPermission(data: PermissionCreateInput) {
 		// PermissionCreateSchema validation ensures required fields are present
-		const existing = await this.repository.findByName(data.name!);
+		const existing = await this.repository.findByName(data.name);
 		if (existing) {
 			throw new ConflictError("Permission with this name already exists");
 		}
