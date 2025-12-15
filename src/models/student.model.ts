@@ -1,11 +1,11 @@
-import { prop, getModelForClass, pre } from "@typegoose/typegoose";
+import { getModelForClass, pre, prop } from "@typegoose/typegoose";
 import { z } from "zod";
 import {
-	createStringSchema,
+	createBooleanSchema,
+	createDateSchema,
 	createEmailSchema,
 	createNumberSchema,
-	createDateSchema,
-	createBooleanSchema,
+	createStringSchema,
 } from "../utils/schema.util";
 
 /**
@@ -66,17 +66,7 @@ export const StudentCreateSchema = z.object({
 	isActive: createBooleanSchema(false),
 });
 
-export const StudentUpdateSchema = z.object({
-	firstName: createStringSchema(false, 2, 50),
-	lastName: createStringSchema(false, 2, 50),
-	email: createEmailSchema(false),
-	password: createStringSchema(false, 6, 100),
-	phone: createStringSchema(false, 10, 15),
-	dateOfBirth: createDateSchema(false),
-	address: createStringSchema(false, 0, 200),
-	enrollmentYear: createNumberSchema(false, 1900, 2100),
-	isActive: createBooleanSchema(false),
-});
+export const StudentUpdateSchema = StudentCreateSchema.partial();
 
 export const StudentLoginSchema = z.object({
 	email: createEmailSchema(true),

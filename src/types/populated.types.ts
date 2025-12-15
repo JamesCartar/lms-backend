@@ -4,8 +4,8 @@
  */
 
 import type { DocumentType } from "@typegoose/typegoose";
-import type { Role } from "../models/role.model";
 import type { Permission } from "../models/permission.model";
+import type { Role } from "../models/role.model";
 
 /**
  * Represents a Role with populated permissions

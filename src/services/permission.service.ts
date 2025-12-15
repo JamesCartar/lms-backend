@@ -1,11 +1,11 @@
-import { PermissionRepository } from "../repositories/permission.repository";
 import type {
 	PermissionCreateInput,
 	PermissionUpdateInput,
 } from "../models/permission.model";
-import { NotFoundError, ConflictError } from "../utils/errors.util";
-import { calculateSkip } from "../utils/pagination.util";
+import { PermissionRepository } from "../repositories/permission.repository";
+import { ConflictError, NotFoundError } from "../utils/errors.util";
 import type { MongoFilter } from "../utils/filter.util";
+import { calculateSkip } from "../utils/pagination.util";
 
 /**
  * Permission Service - Business logic layer for Permission
@@ -19,7 +19,7 @@ export class PermissionService {
 
 	async createPermission(data: PermissionCreateInput) {
 		// PermissionCreateSchema validation ensures required fields are present
-		const existing = await this.repository.findByName(data.name!);
+		const existing = await this.repository.findByName(data.name);
 		if (existing) {
 			throw new ConflictError("Permission with this name already exists");
 		}

@@ -1,15 +1,15 @@
-import { RoleRepository } from "../repositories/role.repository";
-import { PermissionRepository } from "../repositories/permission.repository";
-import type { RoleCreateInput, RoleUpdateInput } from "../models/role.model";
-import {
-	NotFoundError,
-	ConflictError,
-	BadRequestError,
-} from "../utils/errors.util";
-import { calculateSkip } from "../utils/pagination.util";
 import type { Ref } from "@typegoose/typegoose";
 import type { Permission } from "../models/permission.model";
+import type { RoleCreateInput, RoleUpdateInput } from "../models/role.model";
+import { PermissionRepository } from "../repositories/permission.repository";
+import { RoleRepository } from "../repositories/role.repository";
+import {
+	BadRequestError,
+	ConflictError,
+	NotFoundError,
+} from "../utils/errors.util";
 import type { MongoFilter } from "../utils/filter.util";
+import { calculateSkip } from "../utils/pagination.util";
 
 /**
  * Role Service - Business logic layer for Role
@@ -25,7 +25,7 @@ export class RoleService {
 
 	async createRole(data: RoleCreateInput) {
 		// RoleCreateSchema validation ensures required fields are present
-		const existing = await this.repository.findByName(data.name!);
+		const existing = await this.repository.findByName(data.name);
 		if (existing) {
 			throw new ConflictError("Role with this name already exists");
 		}

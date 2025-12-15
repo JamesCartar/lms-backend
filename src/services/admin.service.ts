@@ -1,11 +1,11 @@
+import type { Ref } from "@typegoose/typegoose";
+import type { AdminCreateInput, AdminUpdateInput } from "../models/admin.model";
+import type { Role } from "../models/role.model";
 import { AdminRepository } from "../repositories/admin.repository";
 import { RoleRepository } from "../repositories/role.repository";
-import type { AdminCreateInput, AdminUpdateInput } from "../models/admin.model";
-import { NotFoundError, ConflictError } from "../utils/errors.util";
-import { calculateSkip } from "../utils/pagination.util";
-import type { Ref } from "@typegoose/typegoose";
-import type { Role } from "../models/role.model";
+import { ConflictError, NotFoundError } from "../utils/errors.util";
 import type { MongoFilter } from "../utils/filter.util";
+import { calculateSkip } from "../utils/pagination.util";
 
 /**
  * Admin Service - Business logic layer for Admin
@@ -21,7 +21,7 @@ export class AdminService {
 
 	async createAdmin(data: AdminCreateInput) {
 		// AdminCreateSchema validation ensures required fields are present
-		const existing = await this.repository.findByEmail(data.email!);
+		const existing = await this.repository.findByEmail(data.email);
 		if (existing) {
 			throw new ConflictError("Admin with this email already exists");
 		}
@@ -36,9 +36,9 @@ export class AdminService {
 
 		// In production, password should be hashed here
 		return await this.repository.create({
-			name: data.name!,
-			email: data.email!,
-			password: data.password!,
+			name: data.name,
+			email: data.email,
+			password: data.password,
 			// Zod validates as string (ObjectId), which is valid for Mongoose references
 			role: data.role as Ref<Role> | undefined,
 			isActive: data.isActive,

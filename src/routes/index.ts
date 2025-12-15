@@ -1,11 +1,11 @@
 import { Router } from "express";
+import adminRoutes from "./admin.routes";
+import auditlogRoutes from "./auditlog.routes";
 import authRoutes from "./auth.routes";
 import permissionRoutes from "./permission.routes";
 import roleRoutes from "./role.routes";
-import adminRoutes from "./admin.routes";
 import studentRoutes from "./student.routes";
 import userlogRoutes from "./userlog.routes";
-import auditlogRoutes from "./auditlog.routes";
 
 /**
  * Main Router - Combines all routes

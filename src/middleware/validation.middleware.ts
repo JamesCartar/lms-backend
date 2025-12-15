@@ -1,7 +1,7 @@
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import { ValidationError } from "../utils/errors.util";
 import type { ValidatedQuery } from "../types/request.types";
+import { ValidationError } from "../utils/errors.util";
 
 /**
  * Convert Zod error messages to user-friendly messages

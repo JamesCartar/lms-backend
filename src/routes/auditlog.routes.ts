@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { AuditLogController } from "../controllers/auditlog.controller";
-import { validateQuery } from "../middleware/validation.middleware";
 import { AuditLogFilterQuerySchema } from "../filters/auditlog.filter";
 import { authenticate } from "../middleware/auth.middleware";
 import { checkPermission, isAdmin } from "../middleware/permission.middleware";
+import { validateQuery } from "../middleware/validation.middleware";
 
 /**
  * AuditLog Routes - Defines API endpoints for AuditLog

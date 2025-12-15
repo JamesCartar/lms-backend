@@ -1,10 +1,10 @@
-import { prop, getModelForClass, type Ref, pre } from "@typegoose/typegoose";
+import { getModelForClass, pre, prop, type Ref } from "@typegoose/typegoose";
 import { z } from "zod";
 import {
-	createStringSchema,
-	createEmailSchema,
 	createBooleanSchema,
+	createEmailSchema,
 	createObjectIdSchema,
+	createStringSchema,
 } from "../utils/schema.util";
 import { Role } from "./role.model";
 
@@ -50,13 +50,7 @@ export const AdminCreateSchema = z.object({
 	isActive: createBooleanSchema(false),
 });
 
-export const AdminUpdateSchema = z.object({
-	name: createStringSchema(false, 2, 100),
-	email: createEmailSchema(false),
-	password: createStringSchema(false, 6, 100),
-	role: createObjectIdSchema(false),
-	isActive: createBooleanSchema(false),
-});
+export const AdminUpdateSchema = AdminCreateSchema.partial();
 
 export const AdminLoginSchema = z.object({
 	email: createEmailSchema(true),

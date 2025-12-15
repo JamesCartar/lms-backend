@@ -1,11 +1,11 @@
-import { StudentRepository } from "../repositories/student.repository";
 import type {
 	StudentCreateInput,
 	StudentUpdateInput,
 } from "../models/student.model";
-import { NotFoundError, ConflictError } from "../utils/errors.util";
-import { calculateSkip } from "../utils/pagination.util";
+import { StudentRepository } from "../repositories/student.repository";
+import { ConflictError, NotFoundError } from "../utils/errors.util";
 import type { MongoFilter } from "../utils/filter.util";
+import { calculateSkip } from "../utils/pagination.util";
 
 /**
  * Student Service - Business logic layer for Student
@@ -19,7 +19,7 @@ export class StudentService {
 
 	async createStudent(data: StudentCreateInput) {
 		// StudentCreateSchema validation ensures required fields are present
-		const existing = await this.repository.findByEmail(data.email!);
+		const existing = await this.repository.findByEmail(data.email);
 		if (existing) {
 			throw new ConflictError("Student with this email already exists");
 		}

@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { RoleController } from "../controllers/role.controller";
-import { validate, validateQuery } from "../middleware/validation.middleware";
-import { RoleCreateSchema, RoleUpdateSchema } from "../models/role.model";
 import { RoleFilterQuerySchema } from "../filters/role.filter";
 import { authenticate } from "../middleware/auth.middleware";
-import { checkPermission, isAdmin } from "../middleware/permission.middleware";
 import { saveHistory } from "../middleware/history.middleware";
+import { checkPermission, isAdmin } from "../middleware/permission.middleware";
+import { validate, validateQuery } from "../middleware/validation.middleware";
+import { RoleCreateSchema, RoleUpdateSchema } from "../models/role.model";
 
 /**
  * Role Routes - Defines API endpoints for Role

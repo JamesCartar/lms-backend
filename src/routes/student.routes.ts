@@ -1,14 +1,14 @@
 import { Router } from "express";
 import { StudentController } from "../controllers/student.controller";
+import { StudentFilterQuerySchema } from "../filters/student.filter";
+import { authenticate } from "../middleware/auth.middleware";
+import { saveHistory } from "../middleware/history.middleware";
+import { checkPermission, isAdmin } from "../middleware/permission.middleware";
 import { validate, validateQuery } from "../middleware/validation.middleware";
 import {
 	StudentCreateSchema,
 	StudentUpdateSchema,
 } from "../models/student.model";
-import { StudentFilterQuerySchema } from "../filters/student.filter";
-import { authenticate } from "../middleware/auth.middleware";
-import { checkPermission, isAdmin } from "../middleware/permission.middleware";
-import { saveHistory } from "../middleware/history.middleware";
 
 /**
  * Student Routes - Defines API endpoints for Student
