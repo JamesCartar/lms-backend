@@ -1,14 +1,14 @@
 import type { Request, Response } from "express";
-import { StudentService } from "../services/student.service";
-import { sendSuccessResponse } from "../utils/response.util";
+import { buildStudentFilter } from "../filters/student.filter";
 import { asyncHandler } from "../middleware/error.middleware";
+import { StudentService } from "../services/student.service";
+import { BadRequestError } from "../utils/errors.util";
 import {
-	getPaginationParams,
 	calculatePaginationMeta,
+	getPaginationParams,
 } from "../utils/pagination.util";
 import { getIdParam, getRequiredParam } from "../utils/params.util";
-import { BadRequestError } from "../utils/errors.util";
-import { buildStudentFilter } from "../filters/student.filter";
+import { sendSuccessResponse } from "../utils/response.util";
 
 /**
  * Student Controller - Handles HTTP requests for Student

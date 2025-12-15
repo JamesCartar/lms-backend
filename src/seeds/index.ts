@@ -1,14 +1,14 @@
 import "dotenv/config";
-import bcrypt from "bcryptjs";
 import type { DocumentType } from "@typegoose/typegoose";
-import { PermissionModel, type Permission } from "../models/permission.model";
-import { RoleModel, type Role } from "../models/role.model";
-import { StudentModel } from "../models/student.model";
+import bcrypt from "bcryptjs";
+import { connectDatabase } from "../config/database";
 import { AdminModel } from "../models/admin.model";
+import { type Permission, PermissionModel } from "../models/permission.model";
+import { type Role, RoleModel } from "../models/role.model";
+import { StudentModel } from "../models/student.model";
 import { permissionSeeds } from "./permission.seed";
 import { roleSeeds } from "./role.seed";
 import { studentSeeds } from "./student.seed";
-import { connectDatabase } from "../config/database";
 
 /**
  * Seed Database Script

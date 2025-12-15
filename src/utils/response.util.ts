@@ -1,6 +1,6 @@
 import type { Response } from "express";
-import type { PaginationMeta } from "./pagination.util";
 import type { ValidationErrors } from "../types/validation.types";
+import type { PaginationMeta } from "./pagination.util";
 
 /**
  * Standard Response Format Interface

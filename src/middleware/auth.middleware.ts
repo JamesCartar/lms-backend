@@ -1,7 +1,7 @@
-import type { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { UnauthorizedError } from "../utils/errors.util";
 import type { JwtPayload } from "../types/jwt.types";
+import { UnauthorizedError } from "../utils/errors.util";
 
 /**
  * Authentication Middleware

@@ -1,14 +1,14 @@
 import { Router } from "express";
 import { PermissionController } from "../controllers/permission.controller";
+import { PermissionFilterQuerySchema } from "../filters/permission.filter";
+import { authenticate } from "../middleware/auth.middleware";
+import { saveHistory } from "../middleware/history.middleware";
+import { checkPermission, isAdmin } from "../middleware/permission.middleware";
 import { validate, validateQuery } from "../middleware/validation.middleware";
 import {
 	PermissionCreateSchema,
 	PermissionUpdateSchema,
 } from "../models/permission.model";
-import { PermissionFilterQuerySchema } from "../filters/permission.filter";
-import { authenticate } from "../middleware/auth.middleware";
-import { checkPermission, isAdmin } from "../middleware/permission.middleware";
-import { saveHistory } from "../middleware/history.middleware";
 
 /**
  * Permission Routes - Defines API endpoints for Permission

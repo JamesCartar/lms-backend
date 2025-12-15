@@ -1,10 +1,10 @@
-import { prop, getModelForClass, type Ref, pre } from "@typegoose/typegoose";
+import { getModelForClass, pre, prop, type Ref } from "@typegoose/typegoose";
 import { z } from "zod";
 import {
-	createStringSchema,
-	createEmailSchema,
 	createBooleanSchema,
+	createEmailSchema,
 	createObjectIdSchema,
+	createStringSchema,
 } from "../utils/schema.util";
 import { Role } from "./role.model";
 

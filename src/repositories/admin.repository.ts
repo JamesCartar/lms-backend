@@ -1,5 +1,5 @@
-import { AdminModel, type Admin } from "../models/admin.model";
 import type { DocumentType } from "@typegoose/typegoose";
+import { type Admin, AdminModel } from "../models/admin.model";
 import type { MongoFilter } from "../utils/filter.util";
 
 /**

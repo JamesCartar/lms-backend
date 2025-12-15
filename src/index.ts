@@ -5,8 +5,8 @@ import express, {
 	type Response,
 } from "express";
 import { connectDatabase } from "./config/database";
-import routes from "./routes";
 import { errorHandler } from "./middleware/error.middleware";
+import routes from "./routes";
 import { sendSuccessResponse } from "./utils/response.util";
 
 /**

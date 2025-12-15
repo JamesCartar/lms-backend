@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { UserLogController } from "../controllers/userlog.controller";
-import { validateQuery } from "../middleware/validation.middleware";
 import { UserLogFilterQuerySchema } from "../filters/userlog.filter";
 import { authenticate } from "../middleware/auth.middleware";
 import { checkPermission, isAdmin } from "../middleware/permission.middleware";
+import { validateQuery } from "../middleware/validation.middleware";
 
 /**
  * UserLog Routes - Defines API endpoints for UserLog

@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { AdminController } from "../controllers/admin.controller";
-import { validate, validateQuery } from "../middleware/validation.middleware";
-import { AdminCreateSchema, AdminUpdateSchema } from "../models/admin.model";
 import { AdminFilterQuerySchema } from "../filters/admin.filter";
 import { authenticate } from "../middleware/auth.middleware";
-import { checkPermission, isAdmin } from "../middleware/permission.middleware";
 import { saveHistory } from "../middleware/history.middleware";
+import { checkPermission, isAdmin } from "../middleware/permission.middleware";
+import { validate, validateQuery } from "../middleware/validation.middleware";
+import { AdminCreateSchema, AdminUpdateSchema } from "../models/admin.model";
 
 /**
  * Admin Routes - Defines API endpoints for Admin

@@ -1,5 +1,5 @@
-import { RoleModel, type Role } from "../models/role.model";
 import type { DocumentType } from "@typegoose/typegoose";
+import { type Role, RoleModel } from "../models/role.model";
 import type { MongoFilter } from "../utils/filter.util";
 
 /**

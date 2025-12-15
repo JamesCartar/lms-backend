@@ -1,16 +1,16 @@
-import type { Request, Response } from "express";
 import bcrypt from "bcryptjs";
+import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { asyncHandler } from "../middleware/error.middleware";
 import { AdminModel } from "../models/admin.model";
 import { StudentModel } from "../models/student.model";
-import { sendSuccessResponse } from "../utils/response.util";
-import { asyncHandler } from "../middleware/error.middleware";
-import { UnauthorizedError } from "../utils/errors.util";
 import { UserLogService } from "../services/userlog.service";
 import {
-	type PopulatedRole,
 	hasPermissionDocuments,
+	type PopulatedRole,
 } from "../types/populated.types";
+import { UnauthorizedError } from "../utils/errors.util";
+import { sendSuccessResponse } from "../utils/response.util";
 
 /**
  * Auth Controller - Handles authentication and login

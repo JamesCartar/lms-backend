@@ -1,11 +1,11 @@
-import { prop, getModelForClass, pre } from "@typegoose/typegoose";
+import { getModelForClass, pre, prop } from "@typegoose/typegoose";
 import { z } from "zod";
 import {
-	createStringSchema,
+	createBooleanSchema,
+	createDateSchema,
 	createEmailSchema,
 	createNumberSchema,
-	createDateSchema,
-	createBooleanSchema,
+	createStringSchema,
 } from "../utils/schema.util";
 
 /**
