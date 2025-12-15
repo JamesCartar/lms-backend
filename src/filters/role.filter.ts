@@ -1,5 +1,11 @@
-import { z } from 'zod';
-import { BaseFilterQuerySchema, buildSearchFilter, buildDateRangeFilter, mergeFilters } from '../utils/filter.util';
+import { z } from "zod";
+import {
+	BaseFilterQuerySchema,
+	buildSearchFilter,
+	buildDateRangeFilter,
+	mergeFilters,
+	type MongoFilter,
+} from "../utils/filter.util";
 
 /**
  * Role Filter Builder and Validator
@@ -9,8 +15,8 @@ import { BaseFilterQuerySchema, buildSearchFilter, buildDateRangeFilter, mergeFi
  * Role-specific filter query schema
  */
 export const RoleFilterQuerySchema = BaseFilterQuerySchema.extend({
-  name: z.string().min(1).max(50).optional(),
-  description: z.string().min(1).max(200).optional(),
+	name: z.string().min(1).max(50).optional(),
+	description: z.string().min(1).max(200).optional(),
 });
 
 export type RoleFilterQuery = z.infer<typeof RoleFilterQuerySchema>;
@@ -18,34 +24,39 @@ export type RoleFilterQuery = z.infer<typeof RoleFilterQuerySchema>;
 /**
  * Build MongoDB filter object from validated query parameters
  */
-export const buildRoleFilter = (query: Partial<RoleFilterQuery>): Record<string, any> => {
-  const filters: Record<string, any>[] = [];
+export const buildRoleFilter = (
+	query: Partial<RoleFilterQuery>,
+): MongoFilter => {
+	const filters: MongoFilter[] = [];
 
-  // Search filter - searches across name and description fields
-  if (query.search) {
-    filters.push(buildSearchFilter(query.search, ['name', 'description']));
-  }
+	// Search filter - searches across name and description fields
+	if (query.search) {
+		filters.push(buildSearchFilter(query.search, ["name", "description"]));
+	}
 
-  // Date range filters
-  const dateFilter = buildDateRangeFilter(query.createdBefore, query.createdAfter);
-  if (Object.keys(dateFilter).length > 0) {
-    filters.push(dateFilter);
-  }
+	// Date range filters
+	const dateFilter = buildDateRangeFilter(
+		query.createdBefore,
+		query.createdAfter,
+	);
+	if (Object.keys(dateFilter).length > 0) {
+		filters.push(dateFilter);
+	}
 
-  // Field-specific filters
-  const fieldFilters: Record<string, any> = {};
+	// Field-specific filters
+	const fieldFilters: MongoFilter = {};
 
-  if (query.name) {
-    fieldFilters.name = new RegExp(query.name, 'i');
-  }
+	if (query.name) {
+		fieldFilters.name = new RegExp(query.name, "i");
+	}
 
-  if (query.description) {
-    fieldFilters.description = new RegExp(query.description, 'i');
-  }
+	if (query.description) {
+		fieldFilters.description = new RegExp(query.description, "i");
+	}
 
-  if (Object.keys(fieldFilters).length > 0) {
-    filters.push(fieldFilters);
-  }
+	if (Object.keys(fieldFilters).length > 0) {
+		filters.push(fieldFilters);
+	}
 
-  return mergeFilters(...filters);
+	return mergeFilters(...filters);
 };

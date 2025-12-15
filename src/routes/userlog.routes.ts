@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { UserLogController } from '../controllers/userlog.controller';
-import { validateQuery } from '../middleware/validation.middleware';
-import { UserLogFilterQuerySchema } from '../filters/userlog.filter';
-import { authenticate } from '../middleware/auth.middleware';
-import { checkPermission, isAdmin } from '../middleware/permission.middleware';
+import { Router } from "express";
+import { UserLogController } from "../controllers/userlog.controller";
+import { validateQuery } from "../middleware/validation.middleware";
+import { UserLogFilterQuerySchema } from "../filters/userlog.filter";
+import { authenticate } from "../middleware/auth.middleware";
+import { checkPermission, isAdmin } from "../middleware/permission.middleware";
 
 /**
  * UserLog Routes - Defines API endpoints for UserLog
@@ -16,11 +16,24 @@ const controller = new UserLogController();
 router.use(authenticate);
 router.use(isAdmin); // Ensure only admin type users can access
 
-router.get('/', checkPermission('userlog.read'), validateQuery(UserLogFilterQuerySchema), controller.getAll);
-router.get('/user/:userId', checkPermission('userlog.read'), controller.getByUserId);
-router.get('/:id', checkPermission('userlog.read'), controller.getById);
-router.delete('/clear', checkPermission('userlog.delete'), controller.clearAll);
-router.delete('/clear/user/:userId', checkPermission('userlog.delete'), controller.clearByUserId);
-router.delete('/:id', checkPermission('userlog.delete'), controller.deleteById);
+router.get(
+	"/",
+	checkPermission("userlog.read"),
+	validateQuery(UserLogFilterQuerySchema),
+	controller.getAll,
+);
+router.get(
+	"/user/:userId",
+	checkPermission("userlog.read"),
+	controller.getByUserId,
+);
+router.get("/:id", checkPermission("userlog.read"), controller.getById);
+router.delete("/clear", checkPermission("userlog.delete"), controller.clearAll);
+router.delete(
+	"/clear/user/:userId",
+	checkPermission("userlog.delete"),
+	controller.clearByUserId,
+);
+router.delete("/:id", checkPermission("userlog.delete"), controller.deleteById);
 
 export default router;

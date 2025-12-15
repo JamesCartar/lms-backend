@@ -1,47 +1,53 @@
-import { prop, getModelForClass, pre } from '@typegoose/typegoose';
-import { z } from 'zod';
-import { createStringSchema, createEmailSchema, createNumberSchema, createDateSchema, createBooleanSchema } from '../utils/schema.util';
+import { prop, getModelForClass, pre } from "@typegoose/typegoose";
+import { z } from "zod";
+import {
+	createStringSchema,
+	createEmailSchema,
+	createNumberSchema,
+	createDateSchema,
+	createBooleanSchema,
+} from "../utils/schema.util";
 
 /**
  * Student Model - Defines students in the LMS
  * Types are defined here with Typegoose and reused for Zod validation
  */
-@pre<Student>('save', function() {
-  this.updatedAt = new Date();
+@pre<Student>("save", function () {
+	this.updatedAt = new Date();
 })
 export class Student {
-  @prop({ required: true, trim: true })
-  public firstName!: string;
+	@prop({ required: true, trim: true })
+	public firstName!: string;
 
-  @prop({ required: true, trim: true })
-  public lastName!: string;
+	@prop({ required: true, trim: true })
+	public lastName!: string;
 
-  @prop({ required: true, unique: true, lowercase: true, trim: true })
-  public email!: string;
+	@prop({ required: true, unique: true, lowercase: true, trim: true })
+	public email!: string;
 
-  @prop({ required: true })
-  public password!: string;
+	@prop({ required: true })
+	public password!: string;
 
-  @prop({ trim: true })
-  public phone?: string;
+	@prop({ trim: true })
+	public phone?: string;
 
-  @prop({ type: () => Date })
-  public dateOfBirth?: Date;
+	@prop({ type: () => Date })
+	public dateOfBirth?: Date;
 
-  @prop({ trim: true })
-  public address?: string;
+	@prop({ trim: true })
+	public address?: string;
 
-  @prop({ default: 0 })
-  public enrollmentYear?: number;
+	@prop({ default: 0 })
+	public enrollmentYear?: number;
 
-  @prop({ default: true })
-  public isActive?: boolean;
+	@prop({ default: true })
+	public isActive?: boolean;
 
-  @prop({ default: Date.now })
-  public createdAt?: Date;
+	@prop({ default: Date.now })
+	public createdAt?: Date;
 
-  @prop({ default: Date.now })
-  public updatedAt?: Date;
+	@prop({ default: Date.now })
+	public updatedAt?: Date;
 }
 
 // Get the Mongoose model
@@ -49,32 +55,32 @@ export const StudentModel = getModelForClass(Student);
 
 // Zod schemas derived from the Typegoose model
 export const StudentCreateSchema = z.object({
-  firstName: createStringSchema(true, 2, 50),
-  lastName: createStringSchema(true, 2, 50),
-  email: createEmailSchema(true),
-  password: createStringSchema(true, 6, 100),
-  phone: createStringSchema(false, 10, 15),
-  dateOfBirth: createDateSchema(false),
-  address: createStringSchema(false, 0, 200),
-  enrollmentYear: createNumberSchema(false, 1900, 2100),
-  isActive: createBooleanSchema(false),
+	firstName: createStringSchema(true, 2, 50),
+	lastName: createStringSchema(true, 2, 50),
+	email: createEmailSchema(true),
+	password: createStringSchema(true, 6, 100),
+	phone: createStringSchema(false, 10, 15),
+	dateOfBirth: createDateSchema(false),
+	address: createStringSchema(false, 0, 200),
+	enrollmentYear: createNumberSchema(false, 1900, 2100),
+	isActive: createBooleanSchema(false),
 });
 
 export const StudentUpdateSchema = z.object({
-  firstName: createStringSchema(false, 2, 50),
-  lastName: createStringSchema(false, 2, 50),
-  email: createEmailSchema(false),
-  password: createStringSchema(false, 6, 100),
-  phone: createStringSchema(false, 10, 15),
-  dateOfBirth: createDateSchema(false),
-  address: createStringSchema(false, 0, 200),
-  enrollmentYear: createNumberSchema(false, 1900, 2100),
-  isActive: createBooleanSchema(false),
+	firstName: createStringSchema(false, 2, 50),
+	lastName: createStringSchema(false, 2, 50),
+	email: createEmailSchema(false),
+	password: createStringSchema(false, 6, 100),
+	phone: createStringSchema(false, 10, 15),
+	dateOfBirth: createDateSchema(false),
+	address: createStringSchema(false, 0, 200),
+	enrollmentYear: createNumberSchema(false, 1900, 2100),
+	isActive: createBooleanSchema(false),
 });
 
 export const StudentLoginSchema = z.object({
-  email: createEmailSchema(true),
-  password: createStringSchema(true, 6, 100),
+	email: createEmailSchema(true),
+	password: createStringSchema(true, 6, 100),
 });
 
 // Type inference from Zod schemas
