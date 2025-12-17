@@ -28,15 +28,8 @@ export const authenticate = async (
 			throw new UnauthorizedError("Invalid token format");
 		}
 
-		// Get JWT secret from environment
-		const jwtSecret = env.JWT_SECRET;
-
-		if (!jwtSecret) {
-			throw new Error("JWT_SECRET is not configured");
-		}
-
 		// Verify token
-		const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+		const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
 
 		// Attach decoded payload to request
 		req.jwt = decoded;
@@ -75,13 +68,7 @@ export const optionalAuthenticate = async (
 			return next();
 		}
 
-		const jwtSecret = env.JWT_SECRET;
-
-		if (!jwtSecret) {
-			throw new Error("JWT_SECRET is not configured");
-		}
-
-		const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+		const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
 		req.jwt = decoded;
 
 		next();
