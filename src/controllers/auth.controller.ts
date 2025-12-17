@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { env } from "../config/env";
 import { asyncHandler } from "../middleware/error.middleware";
 import { AdminModel } from "../models/admin.model";
 import { StudentModel } from "../models/student.model";
@@ -68,11 +69,6 @@ export class AuthController {
 		}
 
 		// Generate JWT token
-		const jwtSecret = process.env.JWT_SECRET;
-		if (!jwtSecret) {
-			throw new Error("JWT_SECRET is not configured");
-		}
-
 		const token = jwt.sign(
 			{
 				id: admin._id.toString(),
@@ -84,7 +80,7 @@ export class AuthController {
 				permissions,
 				type: "admin",
 			},
-			jwtSecret,
+			env.JWT_SECRET,
 			{ expiresIn: "24h" },
 		);
 
@@ -143,11 +139,6 @@ export class AuthController {
 		}
 
 		// Generate JWT token
-		const jwtSecret = process.env.JWT_SECRET;
-		if (!jwtSecret) {
-			throw new Error("JWT_SECRET is not configured");
-		}
-
 		const token = jwt.sign(
 			{
 				id: student._id.toString(),
@@ -155,7 +146,7 @@ export class AuthController {
 				permissions: [],
 				type: "student",
 			},
-			jwtSecret,
+			env.JWT_SECRET,
 			{ expiresIn: "24h" },
 		);
 
