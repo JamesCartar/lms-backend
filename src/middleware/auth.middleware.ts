@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { env } from "../config/env";
 import type { JwtPayload } from "../types/jwt.types";
 import { UnauthorizedError } from "../utils/errors.util";
 
@@ -28,7 +29,7 @@ export const authenticate = async (
 		}
 
 		// Get JWT secret from environment
-		const jwtSecret = process.env.JWT_SECRET;
+		const jwtSecret = env.JWT_SECRET;
 
 		if (!jwtSecret) {
 			throw new Error("JWT_SECRET is not configured");
@@ -74,7 +75,7 @@ export const optionalAuthenticate = async (
 			return next();
 		}
 
-		const jwtSecret = process.env.JWT_SECRET;
+		const jwtSecret = env.JWT_SECRET;
 
 		if (!jwtSecret) {
 			throw new Error("JWT_SECRET is not configured");

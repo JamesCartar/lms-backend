@@ -1,10 +1,10 @@
-import "dotenv/config";
 import express, {
 	type Application,
 	type Request,
 	type Response,
 } from "express";
 import { connectDatabase } from "./config/database";
+import { env } from "./config/env";
 import { errorHandler } from "./middleware/error.middleware";
 import routes from "./routes";
 import { sendSuccessResponse } from "./utils/response.util";
@@ -13,7 +13,7 @@ import { sendSuccessResponse } from "./utils/response.util";
  * Main Application - Express server setup
  */
 const app: Application = express();
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT;
 
 // Middleware
 app.use(express.json());
