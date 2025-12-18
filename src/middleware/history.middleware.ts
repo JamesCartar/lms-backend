@@ -23,7 +23,12 @@ export const saveHistory = (resource: string) => {
 		// Override send function to capture response
 		res.json = function (data: ResponseData) {
 			// Only log if the request was successful (2xx status code)
-			if (res.statusCode >= 200 && res.statusCode < 300 && req.jwt) {
+			if (
+				res.statusCode >= 200 &&
+				res.statusCode < 300 &&
+				req.jwt &&
+				process.env.NODE_ENV !== "test"
+			) {
 				const auditLogService = new AuditLogService();
 
 				// Determine action based on HTTP method

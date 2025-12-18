@@ -15,8 +15,8 @@ import { sendSuccessResponse } from "../utils/response.util";
 export class AdminController {
 	private service: AdminService;
 
-	constructor() {
-		this.service = new AdminService();
+	constructor(service: AdminService = new AdminService()) {
+		this.service = service;
 	}
 
 	create = asyncHandler(async (req: Request, res: Response) => {

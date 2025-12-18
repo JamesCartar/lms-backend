@@ -98,6 +98,19 @@ npm run build
 npm start
 ```
 
+## Testing
+
+This codebase uses the native **node:test** runner for unit tests and **SuperTest** plus **mongodb-memory-server** for API integration tests. The in-memory MongoDB instance keeps tests isolated and fast without requiring external services.
+
+Run the full test suite (unit + integration):
+```bash
+npm test
+```
+
+Tests focus on:
+- **Unit tests** for service logic with repository/role dependencies mocked.
+- **Integration tests** for admin HTTP endpoints exercising middleware, validation, and responses against an in-memory database.
+
 ## API Endpoints
 
 ### Health Check
@@ -216,6 +229,7 @@ The project uses:
 - `npm run build` - Build for production
 - `npm start` - Run production build
 - `npm run seed` - Seed database with initial data
+- `npm test` - Run unit and integration tests with the node:test runner
 
 ## Implemented Features
 
@@ -242,7 +256,7 @@ Consider implementing:
 - Two-factor authentication (2FA)
 - Logging system (Winston/Morgan)
 - API documentation (Swagger/OpenAPI)
-- Testing framework (Jest)
+- Broader test coverage for all domains
 - CORS configuration
 - Helmet.js for security headers
 - Account lockout after failed attempts
