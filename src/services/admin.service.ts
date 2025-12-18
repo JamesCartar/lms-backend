@@ -14,9 +14,12 @@ export class AdminService {
 	private repository: AdminRepository;
 	private roleRepository: RoleRepository;
 
-	constructor() {
-		this.repository = new AdminRepository();
-		this.roleRepository = new RoleRepository();
+	constructor(
+		repository: AdminRepository = new AdminRepository(),
+		roleRepository: RoleRepository = new RoleRepository(),
+	) {
+		this.repository = repository;
+		this.roleRepository = roleRepository;
 	}
 
 	async createAdmin(data: AdminCreateInput) {
