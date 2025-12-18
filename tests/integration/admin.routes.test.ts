@@ -19,6 +19,18 @@ type AdminRecord = {
 	updatedAt: Date;
 };
 
+const normalizeIsActive = (value: unknown): boolean => {
+	if (typeof value === "boolean") return value;
+	if (value === undefined) return true;
+	return Boolean(value);
+};
+
+const toComparable = (value: unknown): number | string => {
+	if (value instanceof Date) return value.getTime();
+	if (typeof value === "number" || typeof value === "string") return value;
+	return 0;
+};
+
 class InMemoryAdminRepository {
 	private data: AdminRecord[] = [];
 
@@ -30,12 +42,7 @@ class InMemoryAdminRepository {
 			email: typeof data.email === "string" ? data.email : "",
 			password: typeof data.password === "string" ? data.password : "",
 			role: typeof data.role === "string" ? data.role : undefined,
-			isActive:
-				typeof data.isActive === "boolean"
-					? data.isActive
-					: data.isActive === undefined
-						? true
-						: Boolean(data.isActive),
+			isActive: normalizeIsActive(data.isActive),
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		};
@@ -59,17 +66,8 @@ class InMemoryAdminRepository {
 		_filter?: unknown,
 	) {
 		const sorted = [...this.data].sort((a, b) => {
-			const left = (a as Record<string, unknown>)[sortBy] as
-				| number
-				| string
-				| Date
-				| undefined;
-			const right = (b as Record<string, unknown>)[sortBy] as
-				| number
-				| string
-				| Date
-				| undefined;
-			if (left === undefined || right === undefined) return 0;
+			const left = toComparable((a as Record<string, unknown>)[sortBy]);
+			const right = toComparable((b as Record<string, unknown>)[sortBy]);
 			const comparison = left > right ? 1 : left < right ? -1 : 0;
 			return sortOrder === "asc" ? comparison : -comparison;
 		});

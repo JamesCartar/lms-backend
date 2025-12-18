@@ -17,14 +17,19 @@ class FakeAdminRepository {
 
 	async create(data: Record<string, unknown>) {
 		const id = (this.data.size + 1).toString().padStart(24, "0");
+		let isActive: boolean | undefined;
+		if (typeof data.isActive === "boolean") {
+			isActive = data.isActive;
+		} else if (data.isActive !== undefined) {
+			isActive = Boolean(data.isActive);
+		}
 		const record: AdminRecord = {
 			_id: { toString: () => id },
 			name: typeof data.name === "string" ? data.name : "",
 			email: typeof data.email === "string" ? data.email : "",
 			password: typeof data.password === "string" ? data.password : "",
 			role: typeof data.role === "string" ? data.role : undefined,
-			isActive:
-				typeof data.isActive === "boolean" ? data.isActive : data.isActive === undefined ? undefined : Boolean(data.isActive),
+			isActive,
 		};
 		this.data.set(id, record);
 		return record;
