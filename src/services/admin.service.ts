@@ -1,5 +1,5 @@
 import type { Ref } from "@typegoose/typegoose";
-import type { AdminCreateInput, AdminUpdateInput } from "../models/admin.model";
+import type { Admin, AdminCreateInput, AdminUpdateInput } from "../models/admin.model";
 import type { Role } from "../models/role.model";
 import { AdminRepository } from "../repositories/admin.repository";
 import { RoleRepository } from "../repositories/role.repository";
@@ -7,22 +7,51 @@ import { ConflictError, NotFoundError } from "../utils/errors.util";
 import type { MongoFilter } from "../utils/filter.util";
 import { calculateSkip } from "../utils/pagination.util";
 
+type AdminRecord = {
+	_id: { toString: () => string } | string;
+	name?: string;
+	email?: string;
+	password?: string;
+	role?: Ref<Role> | string;
+	isActive?: boolean;
+};
+
 /**
  * Admin Service - Business logic layer for Admin
  */
+export type AdminRepositoryContract = {
+	create: (data: Partial<Admin>) => Promise<AdminRecord>;
+	findByEmail: (email: string) => Promise<AdminRecord | null>;
+	findById: (id: string) => Promise<AdminRecord | null>;
+	findAll: (
+		skip: number,
+		limit: number,
+		sortBy?: string,
+		sortOrder?: "asc" | "desc",
+		filter?: MongoFilter,
+	) => Promise<AdminRecord[]>;
+	count: (filter?: MongoFilter) => Promise<number>;
+	update: (id: string, data: Partial<Admin>) => Promise<AdminRecord | null>;
+	delete: (id: string) => Promise<AdminRecord | null>;
+};
+
+export type RoleRepositoryContract = {
+	findById: (id: string) => Promise<unknown | null>;
+};
+
 export class AdminService {
-	private repository: AdminRepository;
-	private roleRepository: RoleRepository;
+	private repository: AdminRepositoryContract;
+	private roleRepository: RoleRepositoryContract;
 
 	constructor(
-		repository: AdminRepository = new AdminRepository(),
-		roleRepository: RoleRepository = new RoleRepository(),
+		repository: AdminRepositoryContract = new AdminRepository(),
+		roleRepository: RoleRepositoryContract = new RoleRepository(),
 	) {
 		this.repository = repository;
 		this.roleRepository = roleRepository;
 	}
 
-	async createAdmin(data: AdminCreateInput) {
+	async createAdmin(data: AdminCreateInput): Promise<AdminRecord> {
 		// AdminCreateSchema validation ensures required fields are present
 		const existing = await this.repository.findByEmail(data.email);
 		if (existing) {
@@ -48,7 +77,7 @@ export class AdminService {
 		});
 	}
 
-	async getAdminById(id: string) {
+	async getAdminById(id: string): Promise<AdminRecord> {
 		const admin = await this.repository.findById(id);
 		if (!admin) {
 			throw new NotFoundError("Admin not found");
@@ -62,7 +91,7 @@ export class AdminService {
 		sortBy?: string,
 		sortOrder?: "asc" | "desc",
 		filter: MongoFilter = {},
-	) {
+	): Promise<{ admins: AdminRecord[]; total: number }> {
 		const skip = calculateSkip(page, limit);
 		const admins = await this.repository.findAll(
 			skip,
@@ -75,7 +104,7 @@ export class AdminService {
 		return { admins, total };
 	}
 
-	async updateAdmin(id: string, data: AdminUpdateInput) {
+	async updateAdmin(id: string, data: AdminUpdateInput): Promise<AdminRecord> {
 		if (data.email) {
 			const existing = await this.repository.findByEmail(data.email);
 			if (existing && existing._id.toString() !== id) {
@@ -106,7 +135,7 @@ export class AdminService {
 		return admin;
 	}
 
-	async deleteAdmin(id: string) {
+	async deleteAdmin(id: string): Promise<AdminRecord> {
 		const admin = await this.repository.delete(id);
 		if (!admin) {
 			throw new NotFoundError("Admin not found");

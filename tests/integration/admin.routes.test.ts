@@ -22,15 +22,20 @@ type AdminRecord = {
 class InMemoryAdminRepository {
 	private data: AdminRecord[] = [];
 
-	async create(data: Partial<AdminRecord>) {
+	async create(data: Record<string, unknown>) {
 		const id = (this.data.length + 1).toString().padStart(24, "0");
 		const record: AdminRecord = {
 			_id: id,
-			name: data.name ?? "",
-			email: data.email ?? "",
-			password: data.password ?? "",
-			role: data.role,
-			isActive: data.isActive ?? true,
+			name: typeof data.name === "string" ? data.name : "",
+			email: typeof data.email === "string" ? data.email : "",
+			password: typeof data.password === "string" ? data.password : "",
+			role: typeof data.role === "string" ? data.role : undefined,
+			isActive:
+				typeof data.isActive === "boolean"
+					? data.isActive
+					: data.isActive === undefined
+						? true
+						: Boolean(data.isActive),
 			createdAt: new Date(),
 			updatedAt: new Date(),
 		};
@@ -51,6 +56,7 @@ class InMemoryAdminRepository {
 		limit: number,
 		sortBy: string = "createdAt",
 		sortOrder: "asc" | "desc" = "desc",
+		_filter?: unknown,
 	) {
 		const sorted = [...this.data].sort((a, b) => {
 			const left = (a as Record<string, unknown>)[sortBy] as
@@ -71,11 +77,11 @@ class InMemoryAdminRepository {
 		return sorted.slice(skip, skip + limit);
 	}
 
-	async count() {
+	async count(_filter?: unknown) {
 		return this.data.length;
 	}
 
-	async update(id: string, data: Partial<AdminRecord>) {
+	async update(id: string, data: Record<string, unknown>) {
 		const existing = await this.findById(id);
 		if (!existing) return null;
 		const updated = {
@@ -151,10 +157,7 @@ before(async () => {
 const buildApp = () => {
 	const adminRepository = new InMemoryAdminRepository();
 	const roleRepository = new InMemoryRoleRepository();
-	const adminService = new AdminServiceClass(
-		adminRepository as unknown as any,
-		roleRepository as unknown as any,
-	);
+	const adminService = new AdminServiceClass(adminRepository, roleRepository);
 	const controller = new AdminControllerClass(adminService);
 
 	const app: Application = express();

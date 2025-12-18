@@ -15,11 +15,16 @@ type AdminRecord = {
 class FakeAdminRepository {
 	private data = new Map<string, AdminRecord>();
 
-	async create(data: Partial<AdminRecord>) {
+	async create(data: Record<string, unknown>) {
 		const id = (this.data.size + 1).toString().padStart(24, "0");
 		const record: AdminRecord = {
 			_id: { toString: () => id },
-			...data,
+			name: typeof data.name === "string" ? data.name : "",
+			email: typeof data.email === "string" ? data.email : "",
+			password: typeof data.password === "string" ? data.password : "",
+			role: typeof data.role === "string" ? data.role : undefined,
+			isActive:
+				typeof data.isActive === "boolean" ? data.isActive : data.isActive === undefined ? undefined : Boolean(data.isActive),
 		};
 		this.data.set(id, record);
 		return record;
@@ -38,7 +43,15 @@ class FakeAdminRepository {
 		return this.data.get(id) ?? null;
 	}
 
-	async update(id: string, data: Partial<AdminRecord>) {
+	async findAll() {
+		return Array.from(this.data.values());
+	}
+
+	async count(_filter?: unknown) {
+		return this.data.size;
+	}
+
+	async update(id: string, data: Record<string, unknown>) {
 		const existing = this.data.get(id);
 		if (!existing) return null;
 		const updated = { ...existing, ...data };
@@ -76,10 +89,7 @@ describe("AdminService (unit)", () => {
 	beforeEach(() => {
 		adminRepository = new FakeAdminRepository();
 		roleRepository = new FakeRoleRepository();
-		service = new AdminService(
-			adminRepository as unknown as any,
-			roleRepository as unknown as any,
-		);
+		service = new AdminService(adminRepository, roleRepository);
 	});
 
 	it("creates an admin when email is unique", async () => {
