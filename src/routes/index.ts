@@ -1,5 +1,5 @@
 import { Router } from "express";
-import adminRoutes from "./admin.routes";
+import { createAdminRouter } from "./admin.routes";
 import auditlogRoutes from "./auditlog.routes";
 import authRoutes from "./auth.routes";
 import permissionRoutes from "./permission.routes";
@@ -15,7 +15,7 @@ const router = Router();
 router.use("/auth", authRoutes);
 router.use("/permissions", permissionRoutes);
 router.use("/roles", roleRoutes);
-router.use("/admins", adminRoutes);
+router.use("/admins", createAdminRouter());
 router.use("/students", studentRoutes);
 router.use("/userlogs", userlogRoutes);
 router.use("/auditlogs", auditlogRoutes);

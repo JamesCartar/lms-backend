@@ -131,16 +131,21 @@ let errorHandlerMiddleware: typeof errorHandler;
 before(async () => {
 	process.env.NODE_ENV = "test";
 	process.env.JWT_SECRET = process.env.JWT_SECRET || "integration-secret";
+	// Required by env schema, even though tests use in-memory repositories
 	process.env.MONGODB_URI =
 		process.env.MONGODB_URI || "mongodb://localhost:27017/test-db";
 
-	[{ AdminService: AdminServiceClass }, { AdminController: AdminControllerClass }, { createAdminRouter: createAdminRouterFn }, { errorHandler: errorHandlerMiddleware }] =
-		await Promise.all([
-			import("../../src/services/admin.service"),
-			import("../../src/controllers/admin.controller"),
-			import("../../src/routes/admin.routes"),
-			import("../../src/middleware/error.middleware"),
-		]);
+	const servicesModule = await import("../../src/services/admin.service");
+	AdminServiceClass = servicesModule.AdminService;
+
+	const controllerModule = await import("../../src/controllers/admin.controller");
+	AdminControllerClass = controllerModule.AdminController;
+
+	const routesModule = await import("../../src/routes/admin.routes");
+	createAdminRouterFn = routesModule.createAdminRouter;
+
+	const errorModule = await import("../../src/middleware/error.middleware");
+	errorHandlerMiddleware = errorModule.errorHandler;
 });
 
 const buildApp = () => {

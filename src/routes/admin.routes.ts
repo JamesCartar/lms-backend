@@ -50,5 +50,3 @@ export const createAdminRouter = (
 
 	return router;
 };
-
-export default createAdminRouter();
