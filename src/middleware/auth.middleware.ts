@@ -35,12 +35,19 @@ export const authenticate = async (
 
 		next();
 	} catch (error) {
-		if (error instanceof UnauthorizedError) {
-			next(error);
-			return;
+		if (!(error instanceof UnauthorizedError)) {
+			if (error instanceof Error) {
+				console.error("Authentication error:", error.message);
+			} else {
+				console.error("Authentication error:", error);
+			}
 		}
 
-		next(new UnauthorizedError("Invalid token"));
+		next(
+			error instanceof UnauthorizedError
+				? error
+				: new UnauthorizedError("Invalid token"),
+		);
 	}
 };
 

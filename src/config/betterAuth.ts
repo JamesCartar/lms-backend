@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { memoryAdapter, type MemoryDB } from "better-auth/adapters/memory";
 import { betterAuth } from "better-auth/minimal";
 import { jwt } from "better-auth/plugins/jwt";
@@ -26,15 +27,17 @@ const authMemoryDb: MemoryDB = {
 const betterAuthSecret =
 	env.JWT_SECRET.length >= 32
 		? env.JWT_SECRET
-		: env.JWT_SECRET.padEnd(32, "0");
+		: createHash("sha256").update(env.JWT_SECRET).digest("hex");
+
+const baseUrl = env.BASE_URL ?? `http://localhost:${env.PORT}`;
 
 const auth = betterAuth({
-	baseURL: `http://localhost:${env.PORT}`,
+	baseURL: baseUrl,
 	secret: betterAuthSecret,
 	database: memoryAdapter(authMemoryDb),
 	plugins: [
 		jwt({
-			jwks: { rotationInterval: 0 },
+			jwks: { rotationInterval: 86_400 },
 			jwt: { expirationTime: "24h" },
 		}),
 	],

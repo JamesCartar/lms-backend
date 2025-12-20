@@ -8,6 +8,7 @@ const EnvSchema = z.object({
 	PORT: z.coerce.number().int().positive().default(3000),
 	MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
 	JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
+	BASE_URL: z.string().url().optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
