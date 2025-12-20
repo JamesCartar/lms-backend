@@ -24,8 +24,9 @@ const authMemoryDb: MemoryDB = {
 	webauthnChallenge: [],
 };
 
+const secretByteLength = Buffer.byteLength(env.JWT_SECRET, "utf8");
 const betterAuthSecret =
-	env.JWT_SECRET.length >= 32
+	secretByteLength >= 32
 		? env.JWT_SECRET
 		: createHash("sha256").update(env.JWT_SECRET).digest("hex");
 
@@ -61,29 +62,31 @@ export const signAuthToken = async (
 export const verifyAuthToken = async (
 	token: string,
 ): Promise<JwtPayload | null> => {
-	const { payload } = await auth.api.verifyJWT({ body: { token } });
-	if (!payload || typeof payload.sub !== "string") {
+	try {
+		const { payload } = await auth.api.verifyJWT({ body: { token } });
+		if (!payload || typeof payload.sub !== "string") {
+			return null;
+		}
+		if (payload.type !== "admin" && payload.type !== "student") {
+			return null;
+		}
+		if (typeof payload.email !== "string") {
+			return null;
+		}
+
+		return {
+			id: payload.sub,
+			email: payload.email,
+			role: typeof payload.role === "string" ? payload.role : undefined,
+			permissions: Array.isArray(payload.permissions)
+				? payload.permissions.filter(
+						(permission): permission is string =>
+							typeof permission === "string",
+					)
+				: [],
+			type: payload.type,
+		};
+	} catch (_error) {
 		return null;
 	}
-
-	if (payload.type !== "admin" && payload.type !== "student") {
-		return null;
-	}
-
-	if (typeof payload.email !== "string") {
-		return null;
-	}
-
-	return {
-		id: payload.sub,
-		email: payload.email,
-		role: typeof payload.role === "string" ? payload.role : undefined,
-		permissions: Array.isArray(payload.permissions)
-			? payload.permissions.filter(
-					(permission): permission is string =>
-						typeof permission === "string",
-				)
-			: [],
-		type: payload.type,
-	};
 };

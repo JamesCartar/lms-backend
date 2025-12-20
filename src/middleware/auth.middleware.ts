@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { verifyAuthToken } from "../config/betterAuth";
 import { UnauthorizedError } from "../utils/errors.util";
+import { logError } from "../utils/logger.util";
 
 /**
  * Authentication Middleware
@@ -36,11 +37,7 @@ export const authenticate = async (
 		next();
 	} catch (error) {
 		if (!(error instanceof UnauthorizedError)) {
-			if (error instanceof Error) {
-				console.error("Authentication error:", error.message);
-			} else {
-				console.error("Authentication error:", error);
-			}
+			logError("Authentication error", error);
 		}
 
 		next(
