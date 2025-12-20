@@ -24,6 +24,34 @@ export class AdminRepository {
 		});
 	}
 
+	async findByEmailWithPermissions(
+		email: string,
+	): Promise<DocumentType<Admin> | null> {
+		return await AdminModel.findOne({ email }).populate({
+			path: "role",
+			select: "name description type permissions",
+			populate: {
+				path: "permissions",
+				select: "name resource action description",
+			},
+		});
+	}
+
+	async findByIdWithPermissions(
+		id: string,
+	): Promise<DocumentType<Admin> | null> {
+		return await AdminModel.findById(id)
+			.select("-password")
+			.populate({
+				path: "role",
+				select: "name description type permissions",
+				populate: {
+					path: "permissions",
+					select: "name resource action description",
+				},
+			});
+	}
+
 	async findAll(
 		skip: number,
 		limit: number,
