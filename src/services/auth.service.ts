@@ -136,6 +136,7 @@ export class AuthService {
 			{
 				id: student._id.toString(),
 				email: student.email,
+				role: undefined,
 				permissions: [],
 				type: "student",
 			} satisfies JwtPayload,

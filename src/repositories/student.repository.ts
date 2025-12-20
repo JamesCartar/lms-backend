@@ -17,9 +17,7 @@ export class StudentRepository {
 	async findByIdWithoutPassword(
 		id: string,
 	): Promise<DocumentType<Student> | null> {
-		return (await StudentModel.findById(id).select(
-			"-password",
-		)) as DocumentType<Student> | null;
+		return await StudentModel.findById(id).select("-password").exec();
 	}
 
 	async findByEmail(email: string): Promise<DocumentType<Student> | null> {
