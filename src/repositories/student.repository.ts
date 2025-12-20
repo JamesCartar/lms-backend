@@ -14,6 +14,12 @@ export class StudentRepository {
 		return await StudentModel.findById(id);
 	}
 
+	async findByIdWithoutPassword(
+		id: string,
+	): Promise<DocumentType<Student> | null> {
+		return await StudentModel.findById(id).select("-password").exec();
+	}
+
 	async findByEmail(email: string): Promise<DocumentType<Student> | null> {
 		return await StudentModel.findOne({ email });
 	}
