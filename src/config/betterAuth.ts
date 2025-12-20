@@ -5,6 +5,8 @@ import { jwt } from "better-auth/plugins/jwt";
 import { env } from "./env";
 import type { JwtPayload } from "../types/jwt.types";
 
+const ONE_DAY_IN_SECONDS = 24 * 60 * 60;
+
 const authMemoryDb: MemoryDB = {
 	account: [],
 	audit: [],
@@ -38,11 +40,48 @@ const auth = betterAuth({
 	database: memoryAdapter(authMemoryDb),
 	plugins: [
 		jwt({
-			jwks: { rotationInterval: 86_400 },
+			jwks: { rotationInterval: ONE_DAY_IN_SECONDS },
 			jwt: { expirationTime: "24h" },
 		}),
 	],
 });
+
+const mapVerifiedPayload = (payload: unknown): JwtPayload | null => {
+	if (!payload || typeof payload !== "object") {
+		return null;
+	}
+
+	const {
+		sub,
+		email,
+		role,
+		permissions,
+		type,
+	} = payload as Record<string, unknown>;
+
+	if (typeof sub !== "string" || typeof email !== "string") {
+		return null;
+	}
+
+	if (type !== "admin" && type !== "student") {
+		return null;
+	}
+
+	const safePermissions = Array.isArray(permissions)
+		? permissions.filter(
+				(permission): permission is string =>
+					typeof permission === "string",
+			)
+		: [];
+
+	return {
+		id: sub,
+		email,
+		role: typeof role === "string" ? role : undefined,
+		permissions: safePermissions,
+		type,
+	};
+};
 
 export const signAuthToken = async (
 	payload: JwtPayload,
@@ -64,28 +103,7 @@ export const verifyAuthToken = async (
 ): Promise<JwtPayload | null> => {
 	try {
 		const { payload } = await auth.api.verifyJWT({ body: { token } });
-		if (!payload || typeof payload.sub !== "string") {
-			return null;
-		}
-		if (payload.type !== "admin" && payload.type !== "student") {
-			return null;
-		}
-		if (typeof payload.email !== "string") {
-			return null;
-		}
-
-		return {
-			id: payload.sub,
-			email: payload.email,
-			role: typeof payload.role === "string" ? payload.role : undefined,
-			permissions: Array.isArray(payload.permissions)
-				? payload.permissions.filter(
-						(permission): permission is string =>
-							typeof permission === "string",
-					)
-				: [],
-			type: payload.type,
-		};
+		return mapVerifiedPayload(payload);
 	} catch (_error) {
 		return null;
 	}

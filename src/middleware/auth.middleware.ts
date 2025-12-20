@@ -37,7 +37,7 @@ export const authenticate = async (
 		next();
 	} catch (error) {
 		if (!(error instanceof UnauthorizedError)) {
-			logError("Authentication error", error);
+			logError("Authentication error");
 		}
 
 		next(
