@@ -49,8 +49,13 @@ describe("AdminController", () => {
 		controller = new AdminController();
 	});
 
-	const createMockResponse = () =>
-		({} as Response & { body?: unknown; statusCode?: number });
+	const createMockResponse = () => {
+		const res = {
+			status: jest.fn().mockReturnThis(),
+			json: jest.fn().mockReturnThis(),
+		};
+		return res as unknown as Response;
+	};
 
 	describe("create", () => {
 		it("creates admin and sends success response", async () => {

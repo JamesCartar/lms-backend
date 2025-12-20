@@ -117,6 +117,7 @@ describe("AdminService", () => {
 			adminRepoMock.findAll.mockResolvedValue(admins);
 			adminRepoMock.count.mockResolvedValue(15);
 
+			const expectedSkip = (2 - 1) * 5;
 			const result = await service.getAllAdmins(
 				2,
 				5,
@@ -126,7 +127,7 @@ describe("AdminService", () => {
 			);
 
 			expect(adminRepoMock.findAll).toHaveBeenCalledWith(
-				5,
+				expectedSkip,
 				5,
 				"email",
 				"asc",
