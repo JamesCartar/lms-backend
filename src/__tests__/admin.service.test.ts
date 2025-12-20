@@ -141,7 +141,7 @@ describe("AdminService", () => {
 	describe("updateAdmin", () => {
 		it("throws ConflictError when email belongs to another admin", async () => {
 			adminRepoMock.findByEmail.mockResolvedValue({
-				_id: { toString: () => "different-id" },
+				_id: "different-id",
 			});
 
 			await expect(
