@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 import type { Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import { env } from "../config/env";
+import { signAuthToken } from "../config/betterAuth";
 import { asyncHandler } from "../middleware/error.middleware";
 import { AdminModel } from "../models/admin.model";
 import { StudentModel } from "../models/student.model";
@@ -69,20 +68,16 @@ export class AuthController {
 		}
 
 		// Generate JWT token
-		const token = jwt.sign(
-			{
-				id: admin._id.toString(),
-				email: admin.email,
-				role:
-					admin.role && typeof admin.role === "object"
-						? (admin.role as PopulatedRole).name
-						: undefined,
-				permissions,
-				type: "admin",
-			},
-			env.JWT_SECRET,
-			{ expiresIn: "24h" },
-		);
+		const token = await signAuthToken({
+			id: admin._id.toString(),
+			email: admin.email,
+			role:
+				admin.role && typeof admin.role === "object"
+					? (admin.role as PopulatedRole).name
+					: undefined,
+			permissions,
+			type: "admin",
+		});
 
 		// Log the login
 		this.userLogService
@@ -139,16 +134,12 @@ export class AuthController {
 		}
 
 		// Generate JWT token
-		const token = jwt.sign(
-			{
-				id: student._id.toString(),
-				email: student.email,
-				permissions: [],
-				type: "student",
-			},
-			env.JWT_SECRET,
-			{ expiresIn: "24h" },
-		);
+		const token = await signAuthToken({
+			id: student._id.toString(),
+			email: student.email,
+			permissions: [],
+			type: "student",
+		});
 
 		// Log the login
 		this.userLogService

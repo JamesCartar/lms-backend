@@ -1,7 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import { env } from "../config/env";
-import type { JwtPayload } from "../types/jwt.types";
+import { verifyAuthToken } from "../config/betterAuth";
 import { UnauthorizedError } from "../utils/errors.util";
 
 /**
@@ -12,7 +10,7 @@ export const authenticate = async (
 	req: Request,
 	_res: Response,
 	next: NextFunction,
-): Promise<void> => {
+	): Promise<void> => {
 	try {
 		// Get token from Authorization header
 		const authHeader = req.headers.authorization;
@@ -21,28 +19,28 @@ export const authenticate = async (
 			throw new UnauthorizedError("No token provided. Please authenticate.");
 		}
 
-		// Extract token
 		const token = authHeader.split(" ")[1];
 
 		if (!token) {
 			throw new UnauthorizedError("Invalid token format");
 		}
 
-		// Verify token
-		const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+		const decoded = await verifyAuthToken(token);
+		if (!decoded) {
+			throw new UnauthorizedError("Invalid token");
+		}
 
 		// Attach decoded payload to request
 		req.jwt = decoded;
 
 		next();
 	} catch (error) {
-		if (error instanceof jwt.JsonWebTokenError) {
-			next(new UnauthorizedError("Invalid token"));
-		} else if (error instanceof jwt.TokenExpiredError) {
-			next(new UnauthorizedError("Token expired"));
-		} else {
+		if (error instanceof UnauthorizedError) {
 			next(error);
+			return;
 		}
+
+		next(new UnauthorizedError("Invalid token"));
 	}
 };
 
@@ -68,8 +66,10 @@ export const optionalAuthenticate = async (
 			return next();
 		}
 
-		const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
-		req.jwt = decoded;
+		const decoded = await verifyAuthToken(token);
+		if (decoded) {
+			req.jwt = decoded;
+		}
 
 		next();
 	} catch (_error) {
