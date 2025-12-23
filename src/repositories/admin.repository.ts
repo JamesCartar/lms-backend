@@ -26,6 +26,12 @@ export class AdminRepository {
 		});
 	}
 
+	async findByIdWithPassword(
+		id: string,
+	): Promise<DocumentType<Admin> | null> {
+		return await AdminModel.findById(id);
+	}
+
 	async findByEmail(email: string): Promise<DocumentType<Admin> | null> {
 		return await AdminModel.findOne({ email }).populate({
 			path: "role",

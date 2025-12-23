@@ -8,16 +8,21 @@ import { checkPermission, isAdmin } from "../middleware/permission.middleware";
 import { validate, validateQuery } from "../middleware/validation.middleware";
 
 /**
- * Role Routes - Defines API endpoints for Role
- * All routes require authentication and role.* permissions
+ * Role Routes - Defines API endpoints for Role management
+ * All routes require authentication and admin-level permissions
  */
 const router = Router();
 const controller = new RoleController();
 
-// Apply authentication to all role routes
+// Apply authentication and admin check to all routes
 router.use(authenticate);
-router.use(isAdmin); // Ensure only admin type users can access
+router.use(isAdmin);
 
+/**
+ * POST /
+ * Create a new role
+ * Required permission: role.create
+ */
 router.post(
 	"/",
 	checkPermission("role.create"),
@@ -25,14 +30,39 @@ router.post(
 	saveHistory("role"),
 	controller.create,
 );
+
+/**
+ * GET /names
+ * Get list of all role names
+ * Required permission: role.read
+ * Note: This route must come before /:id to avoid conflicts
+ */
 router.get("/names", checkPermission("role.read"), controller.getRoleNames);
+
+/**
+ * GET /
+ * Get all roles with filtering and pagination
+ * Required permission: role.read
+ */
 router.get(
 	"/",
 	checkPermission("role.read"),
 	validateQuery(RoleFilterQuerySchema),
 	controller.getAll,
 );
+
+/**
+ * GET /:id
+ * Get a specific role by ID
+ * Required permission: role.read
+ */
 router.get("/:id", checkPermission("role.read"), controller.getById);
+
+/**
+ * PUT /:id
+ * Update a role by ID
+ * Required permission: role.update
+ */
 router.put(
 	"/:id",
 	checkPermission("role.update"),
@@ -40,6 +70,12 @@ router.put(
 	saveHistory("role"),
 	controller.update,
 );
+
+/**
+ * DELETE /:id
+ * Delete a role by ID
+ * Required permission: role.delete
+ */
 router.delete(
 	"/:id",
 	checkPermission("role.delete"),

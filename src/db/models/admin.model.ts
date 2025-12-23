@@ -57,7 +57,13 @@ export const AdminLoginSchema = z.object({
 	password: createStringSchema(true, 6, 100),
 });
 
+export const AdminPasswordChangeSchema = z.object({
+	oldPassword: createStringSchema(true, 6, 100),
+	newPassword: createStringSchema(true, 6, 100),
+});
+
 // Type inference from Zod schemas
 export type AdminCreateInput = z.infer<typeof AdminCreateSchema>;
 export type AdminUpdateInput = z.infer<typeof AdminUpdateSchema>;
 export type AdminLoginInput = z.infer<typeof AdminLoginSchema>;
+export type AdminPasswordChangeInput = z.infer<typeof AdminPasswordChangeSchema>;

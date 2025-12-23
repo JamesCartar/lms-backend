@@ -70,4 +70,16 @@ export class AdminController {
 			message: "Admin deleted successfully",
 		});
 	});
+
+	changePassword = asyncHandler(async (req: Request, res: Response) => {
+		const adminId = req.jwt?.id;
+		if (!adminId) {
+			throw new Error("Unauthorized");
+		}
+		await this.service.changePassword(adminId, req.body);
+		sendSuccessResponse(res, {
+			data: null,
+			message: "Password changed successfully",
+		});
+	});
 }

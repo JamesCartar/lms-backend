@@ -1,12 +1,18 @@
 import type { Ref } from "@typegoose/typegoose";
+import bcrypt from "bcryptjs";
 import type {
 	AdminCreateInput,
+	AdminPasswordChangeInput,
 	AdminUpdateInput,
 } from "../db/models/admin.model";
 import type { Role } from "../db/models/role.model";
 import { AdminRepository } from "../repositories/admin.repository";
 import { RoleRepository } from "../repositories/role.repository";
-import { ConflictError, NotFoundError } from "../utils/errors.util";
+import {
+	ConflictError,
+	NotFoundError,
+	UnauthorizedError,
+} from "../utils/errors.util";
 import type { MongoFilter } from "../utils/filter.util";
 import { calculateSkip } from "../utils/pagination.util";
 
@@ -112,5 +118,36 @@ export class AdminService {
 			throw new NotFoundError("Admin not found");
 		}
 		return admin;
+	}
+
+	async changePassword(id: string, data: AdminPasswordChangeInput) {
+		// Get admin with password field
+		const admin = await this.repository.findByIdWithPassword(id);
+		if (!admin) {
+			throw new NotFoundError("Admin not found");
+		}
+
+		// Verify old password
+		const isOldPasswordValid = await bcrypt.compare(
+			data.oldPassword,
+			admin.password,
+		);
+		if (!isOldPasswordValid) {
+			throw new UnauthorizedError("Invalid old password");
+		}
+
+		// Hash new password
+		const hashedPassword = await bcrypt.hash(data.newPassword, 10);
+
+		// Update password
+		const updatedAdmin = await this.repository.update(id, {
+			password: hashedPassword,
+		});
+
+		if (!updatedAdmin) {
+			throw new NotFoundError("Admin not found");
+		}
+
+		return updatedAdmin;
 	}
 }
