@@ -128,6 +128,7 @@ npm start
 - `GET /api/v1/admins/:id` - Get admin by ID (requires admin.read)
 - `PUT /api/v1/admins/:id` - Update admin (requires admin.update)
 - `DELETE /api/v1/admins/:id` - Delete admin (requires admin.delete)
+- `PUT /api/v1/admins/change-password` - Change current admin's password (requires authentication)
 
 ### Students (requires authentication + admin type + student.* permissions)
 - `POST /api/v1/students` - Create a new student (requires student.create)
@@ -237,7 +238,6 @@ Consider implementing:
 
 - ⚠️ **Rate limiting** (high priority for production)
 - Refresh token mechanism
-- Password reset functionality
 - Email verification
 - Two-factor authentication (2FA)
 - Logging system (Winston/Morgan)

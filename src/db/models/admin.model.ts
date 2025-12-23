@@ -66,4 +66,6 @@ export const AdminPasswordChangeSchema = z.object({
 export type AdminCreateInput = z.infer<typeof AdminCreateSchema>;
 export type AdminUpdateInput = z.infer<typeof AdminUpdateSchema>;
 export type AdminLoginInput = z.infer<typeof AdminLoginSchema>;
-export type AdminPasswordChangeInput = z.infer<typeof AdminPasswordChangeSchema>;
+export type AdminPasswordChangeInput = z.infer<
+	typeof AdminPasswordChangeSchema
+>;

@@ -26,9 +26,7 @@ export class AdminRepository {
 		});
 	}
 
-	async findByIdWithPassword(
-		id: string,
-	): Promise<DocumentType<Admin> | null> {
+	async findByIdWithPassword(id: string): Promise<DocumentType<Admin> | null> {
 		return await AdminModel.findById(id);
 	}
 

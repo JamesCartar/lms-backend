@@ -3,13 +3,13 @@ import jwt from "jsonwebtoken";
 import { env } from "../config/env";
 import { AdminRepository } from "../repositories/admin.repository";
 import { StudentRepository } from "../repositories/student.repository";
-import { UserLogService } from "./userlog.service";
 import type { JwtPayload } from "../types/jwt.types";
 import {
 	hasPermissionDocuments,
 	type PopulatedRole,
 } from "../types/populated.types";
 import { UnauthorizedError } from "../utils/errors.util";
+import { UserLogService } from "./userlog.service";
 
 type LoginContext = {
 	ip?: string;
@@ -38,7 +38,10 @@ export class AuthService {
 			const typedRole = role as PopulatedRole;
 			roleName = typedRole.name;
 
-			if (typedRole.permissions && hasPermissionDocuments(typedRole.permissions)) {
+			if (
+				typedRole.permissions &&
+				hasPermissionDocuments(typedRole.permissions)
+			) {
 				typedRole.permissions.forEach((perm) => {
 					if (perm.name) {
 						permissions.push(perm.name);
