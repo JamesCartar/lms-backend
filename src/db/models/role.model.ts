@@ -4,7 +4,7 @@ import {
 	createArraySchema,
 	createObjectIdSchema,
 	createStringSchema,
-} from "../utils/schema.util";
+} from "../../utils/schema.util";
 import { Permission } from "./permission.model";
 
 /**

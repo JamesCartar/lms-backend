@@ -1,5 +1,5 @@
 import type { DocumentType } from "@typegoose/typegoose";
-import { type Admin, AdminModel } from "../models/admin.model";
+import { type Admin, AdminModel } from "../db/models/admin.model";
 import type { MongoFilter } from "../utils/filter.util";
 
 const rolePermissionsPopulate = {
@@ -36,7 +36,9 @@ export class AdminRepository {
 	async findByEmailWithPermissions(
 		email: string,
 	): Promise<DocumentType<Admin> | null> {
-		return await AdminModel.findOne({ email }).populate(rolePermissionsPopulate);
+		return await AdminModel.findOne({ email }).populate(
+			rolePermissionsPopulate,
+		);
 	}
 
 	async findByIdWithPermissions(

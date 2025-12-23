@@ -1,7 +1,7 @@
 import "dotenv/config";
 import type { DocumentType } from "@typegoose/typegoose";
 import bcrypt from "bcryptjs";
-import { connectDatabase } from "../config/database";
+import { connectDatabase } from "../../config/database";
 import { AdminModel } from "../models/admin.model";
 import { type Permission, PermissionModel } from "../models/permission.model";
 import { type Role, RoleModel } from "../models/role.model";

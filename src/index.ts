@@ -1,3 +1,4 @@
+import cors from "cors";
 import express, {
 	type Application,
 	type Request,
@@ -18,6 +19,13 @@ const PORT = env.PORT;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(
+	cors({
+		origin: env.TRUSTED_ORIGINS,
+		credentials: true,
+	}),
+);
 
 // Health check route
 app.get("/health", (_req: Request, res: Response) => {

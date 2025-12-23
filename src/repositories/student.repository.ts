@@ -1,5 +1,5 @@
 import type { DocumentType } from "@typegoose/typegoose";
-import { type Student, StudentModel } from "../models/student.model";
+import { type Student, StudentModel } from "../db/models/student.model";
 import type { MongoFilter } from "../utils/filter.util";
 
 /**

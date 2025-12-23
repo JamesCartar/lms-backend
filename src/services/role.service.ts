@@ -1,6 +1,6 @@
 import type { Ref } from "@typegoose/typegoose";
-import type { Permission } from "../models/permission.model";
-import type { RoleCreateInput, RoleUpdateInput } from "../models/role.model";
+import type { Permission } from "../db/models/permission.model";
+import type { RoleCreateInput, RoleUpdateInput } from "../db/models/role.model";
 import { PermissionRepository } from "../repositories/permission.repository";
 import { RoleRepository } from "../repositories/role.repository";
 import {

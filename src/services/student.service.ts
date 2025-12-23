@@ -1,7 +1,7 @@
 import type {
 	StudentCreateInput,
 	StudentUpdateInput,
-} from "../models/student.model";
+} from "../db/models/student.model";
 import { StudentRepository } from "../repositories/student.repository";
 import { ConflictError, NotFoundError } from "../utils/errors.util";
 import type { MongoFilter } from "../utils/filter.util";
