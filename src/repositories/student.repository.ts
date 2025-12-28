@@ -1,5 +1,5 @@
 import type { DocumentType } from "@typegoose/typegoose";
-import { type Student, StudentModel } from "../models/student.model";
+import { type Student, StudentModel } from "../db/models/student.model";
 import type { MongoFilter } from "../utils/filter.util";
 
 /**
@@ -12,6 +12,12 @@ export class StudentRepository {
 
 	async findById(id: string): Promise<DocumentType<Student> | null> {
 		return await StudentModel.findById(id);
+	}
+
+	async findByIdWithoutPassword(
+		id: string,
+	): Promise<DocumentType<Student> | null> {
+		return await StudentModel.findById(id).select("-password").exec();
 	}
 
 	async findByEmail(email: string): Promise<DocumentType<Student> | null> {

@@ -1,5 +1,8 @@
 import type { DocumentType } from "@typegoose/typegoose";
-import { type Permission, PermissionModel } from "../models/permission.model";
+import {
+	type Permission,
+	PermissionModel,
+} from "../db/models/permission.model";
 import type { MongoFilter } from "../utils/filter.util";
 
 /**

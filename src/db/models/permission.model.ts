@@ -1,6 +1,6 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
 import { z } from "zod";
-import { createStringSchema } from "../utils/schema.util";
+import { createStringSchema } from "../../utils/schema.util";
 
 /**
  * Permission Model - Defines permissions in the system

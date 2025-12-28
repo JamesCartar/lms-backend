@@ -1,6 +1,9 @@
 import type { Ref } from "@typegoose/typegoose";
-import type { AdminCreateInput, AdminUpdateInput } from "../models/admin.model";
-import type { Role } from "../models/role.model";
+import type {
+	AdminCreateInput,
+	AdminUpdateInput,
+} from "../db/models/admin.model";
+import type { Role } from "../db/models/role.model";
 import { AdminRepository } from "../repositories/admin.repository";
 import { RoleRepository } from "../repositories/role.repository";
 import { ConflictError, NotFoundError } from "../utils/errors.util";

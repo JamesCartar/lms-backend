@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
+import { AdminLoginSchema } from "../db/models/admin.model";
+import { StudentLoginSchema } from "../db/models/student.model";
 import { authenticate } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validation.middleware";
-import { AdminLoginSchema } from "../models/admin.model";
-import { StudentLoginSchema } from "../models/student.model";
 
 /**
  * Auth Routes - Handles authentication endpoints

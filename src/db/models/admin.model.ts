@@ -5,7 +5,7 @@ import {
 	createEmailSchema,
 	createObjectIdSchema,
 	createStringSchema,
-} from "../utils/schema.util";
+} from "../../utils/schema.util";
 import { Role } from "./role.model";
 
 /**

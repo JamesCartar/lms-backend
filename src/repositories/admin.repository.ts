@@ -1,6 +1,15 @@
 import type { DocumentType } from "@typegoose/typegoose";
-import { type Admin, AdminModel } from "../models/admin.model";
+import { type Admin, AdminModel } from "../db/models/admin.model";
 import type { MongoFilter } from "../utils/filter.util";
+
+const rolePermissionsPopulate = {
+	path: "role",
+	select: "name description type permissions",
+	populate: {
+		path: "permissions",
+		select: "name resource action description",
+	},
+};
 
 /**
  * Admin Repository - Data access layer for Admin
@@ -22,6 +31,22 @@ export class AdminRepository {
 			path: "role",
 			select: "name description type",
 		});
+	}
+
+	async findByEmailWithPermissions(
+		email: string,
+	): Promise<DocumentType<Admin> | null> {
+		return await AdminModel.findOne({ email }).populate(
+			rolePermissionsPopulate,
+		);
+	}
+
+	async findByIdWithPermissions(
+		id: string,
+	): Promise<DocumentType<Admin> | null> {
+		return await AdminModel.findById(id)
+			.select("-password")
+			.populate(rolePermissionsPopulate);
 	}
 
 	async findAll(

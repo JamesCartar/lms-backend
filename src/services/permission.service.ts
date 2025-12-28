@@ -1,7 +1,7 @@
 import type {
 	PermissionCreateInput,
 	PermissionUpdateInput,
-} from "../models/permission.model";
+} from "../db/models/permission.model";
 import { PermissionRepository } from "../repositories/permission.repository";
 import { ConflictError, NotFoundError } from "../utils/errors.util";
 import type { MongoFilter } from "../utils/filter.util";

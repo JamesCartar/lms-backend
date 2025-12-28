@@ -1,6 +1,6 @@
 import type { DocumentType } from "@typegoose/typegoose";
 import { Types } from "mongoose";
-import { type AuditLog, AuditLogModel } from "../models/auditlog.model";
+import { type AuditLog, AuditLogModel } from "../db/models/auditlog.model";
 import type { MongoFilter } from "../utils/filter.util";
 
 /**

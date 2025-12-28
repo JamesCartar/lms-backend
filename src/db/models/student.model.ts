@@ -6,7 +6,7 @@ import {
 	createEmailSchema,
 	createNumberSchema,
 	createStringSchema,
-} from "../utils/schema.util";
+} from "../../utils/schema.util";
 
 /**
  * Student Model - Defines students in the LMS
