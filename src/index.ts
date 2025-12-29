@@ -23,7 +23,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
 	cors({
 		origin: env.TRUSTED_ORIGINS,
-		credentials: true,
 	}),
 );
 
