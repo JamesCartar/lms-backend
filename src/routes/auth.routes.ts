@@ -1,9 +1,9 @@
-import { Router } from "express";
-import { AuthController } from "../controllers/auth.controller";
-import { AdminLoginSchema } from "../db/models/admin.model";
-import { StudentLoginSchema } from "../db/models/student.model";
-import { authenticate } from "../middleware/auth.middleware";
-import { validate } from "../middleware/validation.middleware";
+import { Router } from 'express';
+import { AuthController } from '../controllers/auth.controller';
+import { AdminLoginSchema } from '../db/models/admin.model';
+import { StudentLoginSchema } from '../db/models/student.model';
+import { authenticate } from '../middleware/auth.middleware';
+import { validate } from '../middleware/validation.middleware';
 
 /**
  * Auth Routes - Handles authentication endpoints
@@ -12,14 +12,16 @@ const router = Router();
 const controller = new AuthController();
 
 // Public routes (no authentication required)
-router.post("/login/admin", validate(AdminLoginSchema), controller.loginAdmin);
+// router.post('/forgot-password');
+
+router.post('/login/admin', validate(AdminLoginSchema), controller.loginAdmin);
 router.post(
-	"/login/student",
+	'/login/student',
 	validate(StudentLoginSchema),
-	controller.loginStudent,
+	controller.loginStudent
 );
 
 // Protected route (requires authentication)
-router.get("/me", authenticate, controller.getMe);
+router.get('/me', authenticate, controller.getMe);
 
 export default router;
