@@ -1,5 +1,5 @@
-import { Types } from "mongoose";
-import { z } from "zod";
+import { Types } from 'mongoose';
+import { z } from 'zod';
 
 /**
  * Utility to create Zod schemas from Typegoose model properties
@@ -10,17 +10,17 @@ import { z } from "zod";
 export function createStringSchema(
 	required: true,
 	minLength?: number,
-	maxLength?: number,
+	maxLength?: number
 ): z.ZodString;
 export function createStringSchema(
 	required: false,
 	minLength?: number,
-	maxLength?: number,
+	maxLength?: number
 ): z.ZodOptional<z.ZodString>;
 export function createStringSchema(
 	required: boolean = true,
 	minLength?: number,
-	maxLength?: number,
+	maxLength?: number
 ): z.ZodString | z.ZodOptional<z.ZodString> {
 	let schema = z.string();
 	if (minLength) schema = schema.min(minLength);
@@ -31,7 +31,7 @@ export function createStringSchema(
 export function createEmailSchema(required: true): z.ZodString;
 export function createEmailSchema(required: false): z.ZodOptional<z.ZodString>;
 export function createEmailSchema(
-	required: boolean = true,
+	required: boolean = true
 ): z.ZodString | z.ZodOptional<z.ZodString> {
 	const schema = z.string().email();
 	return required ? schema : schema.optional();
@@ -40,17 +40,17 @@ export function createEmailSchema(
 export function createNumberSchema(
 	required: true,
 	min?: number,
-	max?: number,
+	max?: number
 ): z.ZodNumber;
 export function createNumberSchema(
 	required: false,
 	min?: number,
-	max?: number,
+	max?: number
 ): z.ZodOptional<z.ZodNumber>;
 export function createNumberSchema(
 	required: boolean = true,
 	min?: number,
-	max?: number,
+	max?: number
 ): z.ZodNumber | z.ZodOptional<z.ZodNumber> {
 	let schema = z.number();
 	if (min !== undefined) schema = schema.min(min);
@@ -61,22 +61,22 @@ export function createNumberSchema(
 export function createDateSchema(required: true): z.ZodType<Date>;
 export function createDateSchema(required: false): z.ZodType<Date | undefined>;
 export function createDateSchema(
-	required: boolean = true,
+	required: boolean = true
 ): z.ZodType<Date> | z.ZodType<Date | undefined> {
 	const schema = z
 		.union([z.string().datetime(), z.date()])
 		.transform((val: string | Date) =>
-			typeof val === "string" ? new Date(val) : val,
+			typeof val === 'string' ? new Date(val) : val
 		);
 	return required ? schema : schema.optional();
 }
 
 export function createBooleanSchema(required: true): z.ZodBoolean;
 export function createBooleanSchema(
-	required: false,
+	required: false
 ): z.ZodOptional<z.ZodBoolean>;
 export function createBooleanSchema(
-	required: boolean = true,
+	required: boolean = true
 ): z.ZodBoolean | z.ZodOptional<z.ZodBoolean> {
 	const schema = z.boolean();
 	return required ? schema : schema.optional();
@@ -84,15 +84,15 @@ export function createBooleanSchema(
 
 export function createArraySchema<T extends z.ZodTypeAny>(
 	itemSchema: T,
-	required: true,
+	required: true
 ): z.ZodArray<T>;
 export function createArraySchema<T extends z.ZodTypeAny>(
 	itemSchema: T,
-	required: false,
+	required: false
 ): z.ZodOptional<z.ZodArray<T>>;
 export function createArraySchema<T extends z.ZodTypeAny>(
 	itemSchema: T,
-	required: boolean = true,
+	required: boolean = true
 ): z.ZodArray<T> | z.ZodOptional<z.ZodArray<T>> {
 	const schema = z.array(itemSchema);
 	return required ? schema : schema.optional();
@@ -100,12 +100,31 @@ export function createArraySchema<T extends z.ZodTypeAny>(
 
 export function createObjectIdSchema(required: true): z.ZodString;
 export function createObjectIdSchema(
-	required: false,
+	required: false
 ): z.ZodOptional<z.ZodString>;
 export function createObjectIdSchema(
-	required: boolean = true,
+	required: boolean = true
 ): z.ZodString | z.ZodOptional<z.ZodString> {
 	const schema = z.string().regex(/^[0-9a-fA-F]{24}$/);
+	return required ? schema : schema.optional();
+}
+
+export function createOtpSchema(required: true, length?: number): z.ZodString;
+export function createOtpSchema(
+	required: false,
+	length?: number
+): z.ZodOptional<z.ZodString>;
+export function createOtpSchema(
+	required: boolean = true,
+	length: number = 6
+): z.ZodString | z.ZodOptional<z.ZodString> {
+	const schema = z
+		.string()
+		.regex(
+			new RegExp(`^\\d{${length}}$`),
+			`OTP must be exactly ${length} digits`
+		);
+
 	return required ? schema : schema.optional();
 }
 
