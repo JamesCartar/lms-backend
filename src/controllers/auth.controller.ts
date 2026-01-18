@@ -1,8 +1,8 @@
-import type { Request, Response } from 'express';
-import { asyncHandler } from '../middleware/error.middleware';
-import { AuthService } from '../services/auth.service';
-import { UnauthorizedError } from '../utils/errors.util';
-import { sendSuccessResponse } from '../utils/response.util';
+import type { Request, Response } from "express";
+import { asyncHandler } from "../middleware/error.middleware";
+import { AuthService } from "../services/auth.service";
+import { UnauthorizedError } from "../utils/errors.util";
+import { sendSuccessResponse } from "../utils/response.util";
 
 /**
  * Auth Controller - Handles authentication and login
@@ -23,12 +23,12 @@ export class AuthController {
 
 		const result = await this.authService.loginAdmin(email, password, {
 			ip: req.ip || req.socket.remoteAddress,
-			userAgent: req.get('user-agent'),
+			userAgent: req.get("user-agent"),
 		});
 
 		sendSuccessResponse(res, {
 			data: result,
-			message: 'Login successful',
+			message: "Login successful",
 		});
 	});
 
@@ -41,12 +41,12 @@ export class AuthController {
 
 		const result = await this.authService.loginStudent(email, password, {
 			ip: req.ip || req.socket.remoteAddress,
-			userAgent: req.get('user-agent'),
+			userAgent: req.get("user-agent"),
 		});
 
 		sendSuccessResponse(res, {
 			data: result,
-			message: 'Login successful',
+			message: "Login successful",
 		});
 	});
 
@@ -55,7 +55,7 @@ export class AuthController {
 	 */
 	getMe = asyncHandler(async (req: Request, res: Response) => {
 		if (!req.jwt) {
-			throw new UnauthorizedError('Not authenticated');
+			throw new UnauthorizedError("Not authenticated");
 		}
 
 		const user = await this.authService.getCurrentUser(req.jwt);
@@ -68,41 +68,43 @@ export class AuthController {
 	 * Ask Admin Email
 	 * Send OTP
 	 */
-	sendForgotPasswordOtp = asyncHandler(
-		async (req: Request, res: Response) => {
-			const email = req.body.email;
-			const otp = await this.authService.sendForgotPasswordOtp(email);
+	sendForgotPasswordOtp = asyncHandler(async (req: Request, res: Response) => {
+		const { email, source } = req.body;
+		const otp = await this.authService.sendForgotPasswordOtp(email, source);
 
-			sendSuccessResponse(res, {
-				data: { otp },
-				message: 'Otp send successfully.',
-				statusCode: 200,
-			});
-		}
-	);
+		sendSuccessResponse(res, {
+			data: { otp },
+			message: "Otp send successfully.",
+			statusCode: 200,
+		});
+	});
 
 	verifyForgotPasswordOtp = asyncHandler(
 		async (req: Request, res: Response) => {
-			const { email, otp } = req.body;
+			const { email, otp, source } = req.body;
 
-			await this.authService.verifyForgotPasswordOtp(email, otp);
+			await this.authService.verifyForgotPasswordOtp({
+				email,
+				otp,
+				source,
+			});
 
 			sendSuccessResponse(res, {
 				data: null,
-				message: 'Otp verified successfully.',
+				message: "Otp verified successfully.",
 				statusCode: 200,
 			});
-		}
+		},
 	);
 
 	resetPasswordWithOtp = asyncHandler(async (req: Request, res: Response) => {
-		const { email, newPassword } = req.body;
+		const { email, newPassword, source } = req.body;
 
-		await this.authService.resetPasswordWithOtp(email, newPassword);
+		await this.authService.resetPasswordWithOtp({ email, newPassword, source });
 
 		sendSuccessResponse(res, {
 			data: null,
-			message: 'Password reset successfully.',
+			message: "Password reset successfully.",
 			statusCode: 200,
 		});
 	});

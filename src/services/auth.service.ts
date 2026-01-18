@@ -1,23 +1,26 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { env } from '../config/env';
-import { AdminRepository } from '../repositories/admin.repository';
-import { StudentRepository } from '../repositories/student.repository';
-import { UserLogService } from './userlog.service';
-import type { JwtPayload } from '../types/jwt.types';
+import { DocumentType } from "@typegoose/typegoose";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { env } from "../config/env";
+import { Admin } from "../db/models/admin.model";
+import { OtpTargetType } from "../db/models/otp.model";
+import { Student } from "../db/models/student.model";
+import { AdminRepository } from "../repositories/admin.repository";
+import { OtpRepository } from "../repositories/otp.repository";
+import { StudentRepository } from "../repositories/student.repository";
+import type { JwtPayload } from "../types/jwt.types";
 import {
 	hasPermissionDocuments,
 	type PopulatedRole,
-} from '../types/populated.types';
+} from "../types/populated.types";
 import {
 	BadRequestError,
 	NotFoundError,
 	UnauthorizedError,
-} from '../utils/errors.util';
-import { OtpRepository } from '../repositories/otp.repository';
-import { generateOtp, sendOtpEmail } from '../utils/otp.util';
-import { OtpTargetType } from '../db/models/otp.model';
-import { hashedPassword } from '../utils/password.util';
+} from "../utils/errors.util";
+import { generateOtp, sendOtpEmail } from "../utils/otp.util";
+import { hashedPassword } from "../utils/password.util";
+import { UserLogService } from "./userlog.service";
 
 type LoginContext = {
 	ip?: string;
@@ -44,7 +47,7 @@ export class AuthService {
 		const permissions: string[] = [];
 		let roleName: string | undefined;
 
-		if (role && typeof role === 'object') {
+		if (role && typeof role === "object") {
 			const typedRole = role as PopulatedRole;
 			roleName = typedRole.name;
 
@@ -65,7 +68,7 @@ export class AuthService {
 
 	private logLogin(data: {
 		userId: string;
-		userType: 'admin' | 'student';
+		userType: "admin" | "student";
 		email: string;
 		context: LoginContext;
 	}) {
@@ -79,24 +82,54 @@ export class AuthService {
 			})
 			.catch((error) => {
 				// Don't fail login if logging fails
-				console.error('Failed to create user log:', error);
+				console.error("Failed to create user log:", error);
 			});
 	}
 
+	private readonly passwordResetStrategy: Record<
+		OtpTargetType,
+		{
+			findByEmail: (
+				email: string,
+			) => Promise<DocumentType<Admin> | DocumentType<Student> | null>;
+			updatePassword: (
+				id: string,
+				hashedPassword: string,
+			) => Promise<DocumentType<Admin> | DocumentType<Student> | null>;
+		}
+	> = {
+		[OtpTargetType.ADMIN]: {
+			findByEmail: (email) => this.adminRepository.findByEmail(email),
+
+			updatePassword: (id, hashedPassword) =>
+				this.adminRepository.update(id, {
+					password: hashedPassword,
+				}),
+		},
+
+		[OtpTargetType.STUDENT]: {
+			findByEmail: (email) => this.studentRepository.findByEmail(email),
+
+			updatePassword: (id, hashedPassword) =>
+				this.studentRepository.update(id, {
+					password: hashedPassword,
+				}),
+		},
+	};
+
 	async loginAdmin(email: string, password: string, context: LoginContext) {
-		const admin =
-			await this.adminRepository.findByEmailWithPermissions(email);
+		const admin = await this.adminRepository.findByEmailWithPermissions(email);
 		if (!admin) {
-			throw new UnauthorizedError('Invalid email or password');
+			throw new UnauthorizedError("Invalid email or password");
 		}
 
 		if (!admin.isActive) {
-			throw new UnauthorizedError('Account is inactive');
+			throw new UnauthorizedError("Account is inactive");
 		}
 
 		const isPasswordValid = await bcrypt.compare(password, admin.password);
 		if (!isPasswordValid) {
-			throw new UnauthorizedError('Invalid email or password');
+			throw new UnauthorizedError("Invalid email or password");
 		}
 
 		const { roleName, permissions } = this.extractRoleData(admin.role);
@@ -106,15 +139,15 @@ export class AuthService {
 				email: admin.email,
 				role: roleName,
 				permissions,
-				type: 'admin',
+				type: "admin",
 			} satisfies JwtPayload,
 			env.JWT_SECRET,
-			{ expiresIn: '24h' },
+			{ expiresIn: "24h" },
 		);
 
 		this.logLogin({
 			userId: admin._id.toString(),
-			userType: 'admin',
+			userType: "admin",
 			email: admin.email,
 			context,
 		});
@@ -126,7 +159,7 @@ export class AuthService {
 				name: admin.name,
 				email: admin.email,
 				role: admin.role,
-				type: 'admin' as const,
+				type: "admin" as const,
 			},
 		};
 	}
@@ -134,19 +167,16 @@ export class AuthService {
 	async loginStudent(email: string, password: string, context: LoginContext) {
 		const student = await this.studentRepository.findByEmail(email);
 		if (!student) {
-			throw new UnauthorizedError('Invalid email or password');
+			throw new UnauthorizedError("Invalid email or password");
 		}
 
 		if (!student.isActive) {
-			throw new UnauthorizedError('Account is inactive');
+			throw new UnauthorizedError("Account is inactive");
 		}
 
-		const isPasswordValid = await bcrypt.compare(
-			password,
-			student.password,
-		);
+		const isPasswordValid = await bcrypt.compare(password, student.password);
 		if (!isPasswordValid) {
-			throw new UnauthorizedError('Invalid email or password');
+			throw new UnauthorizedError("Invalid email or password");
 		}
 
 		const token = jwt.sign(
@@ -155,15 +185,15 @@ export class AuthService {
 				email: student.email,
 				role: undefined,
 				permissions: [],
-				type: 'student',
+				type: "student",
 			} satisfies JwtPayload,
 			env.JWT_SECRET,
-			{ expiresIn: '24h' },
+			{ expiresIn: "24h" },
 		);
 
 		this.logLogin({
 			userId: student._id.toString(),
-			userType: 'student',
+			userType: "student",
 			email: student.email,
 			context,
 		});
@@ -175,19 +205,19 @@ export class AuthService {
 				firstName: student.firstName,
 				lastName: student.lastName,
 				email: student.email,
-				type: 'student' as const,
+				type: "student" as const,
 			},
 		};
 	}
 
 	async getCurrentUser(jwtPayload: JwtPayload) {
-		if (jwtPayload.type === 'admin') {
+		if (jwtPayload.type === "admin") {
 			const admin = await this.adminRepository.findByIdWithPermissions(
 				jwtPayload.id,
 			);
 
 			if (!admin) {
-				throw new UnauthorizedError('User not found');
+				throw new UnauthorizedError("User not found");
 			}
 
 			return admin;
@@ -198,28 +228,41 @@ export class AuthService {
 		);
 
 		if (!student) {
-			throw new UnauthorizedError('User not found');
+			throw new UnauthorizedError("User not found");
 		}
 
 		return student;
 	}
 
 	// * Admin ရှိမရှိ စစ် , Otp ရှိမရှိ စစ် , နောက်မှ create လုပ်
-	async sendForgotPasswordOtp(email: string) {
-		const checkAdminExist = await this.adminRepository.findByEmail(email);
+	async sendForgotPasswordOtp(email: string, source: OtpTargetType) {
+		console.log({ email, source });
+		let identity: Admin | Student | null;
+		switch (source) {
+			case OtpTargetType.ADMIN:
+				identity = await this.adminRepository.findByEmail(email);
+				console.log({ identity });
 
-		if (!checkAdminExist) throw new NotFoundError('Admin Email not found.');
+				break;
 
-		const checkOtpExist = await this.otpRepository.findByEmail(email);
+			default:
+				identity = await this.studentRepository.findByEmail(email);
+				console.log({ identity });
+				break;
+		}
 
-		if (checkOtpExist) throw new BadRequestError('Otp already exist');
+		if (!identity) throw new NotFoundError("Email not found.");
+
+		const checkOtpExist = await this.otpRepository.findByEmail(email, source);
+
+		if (checkOtpExist) throw new BadRequestError("Otp already exist");
 
 		const generatedOtp = generateOtp(6);
 
 		await this.otpRepository.create({
 			otp: generatedOtp,
 			email,
-			type: OtpTargetType.ADMIN,
+			type: source,
 		});
 
 		await sendOtpEmail(email, generatedOtp);
@@ -227,32 +270,54 @@ export class AuthService {
 		return generatedOtp;
 	}
 
-	async verifyForgotPasswordOtp(email: string, otp: string) {
-		const checkOtpExist = await this.otpRepository.findByEmail(email);
+	async verifyForgotPasswordOtp({
+		email,
+		otp,
+		source,
+	}: {
+		email: string;
+		otp: string;
+		source: OtpTargetType;
+	}) {
+		const checkOtpExist = await this.otpRepository.findByEmail(email, source);
 
-		if (!checkOtpExist) throw new NotFoundError('OTP not found.');
+		if (!checkOtpExist) throw new NotFoundError("OTP not found.");
 
 		if (checkOtpExist?.verified)
-			throw new BadRequestError('Otp already verified.');
+			throw new BadRequestError("Otp already verified.");
 
-		const result = await this.otpRepository.update(email, otp, {
-			verified: true,
+		const result = await this.otpRepository.update({
+			email,
+			otp,
+			source,
+			data: {
+				verified: true,
+			},
 		});
 
-		if (!result) throw new NotFoundError('OTP not found.');
+		if (!result) throw new NotFoundError("OTP not found.");
 
 		return result;
 	}
 
-	async resetPasswordWithOtp(email: string, rawPassword: string) {
-		const checkAdminExist = await this.adminRepository.findByEmail(email);
+	async resetPasswordWithOtp({
+		email,
+		newPassword,
+		source,
+	}: {
+		email: string;
+		newPassword: string;
+		source: OtpTargetType;
+	}) {
+		const strategy = this.passwordResetStrategy[source];
 
-		if (!checkAdminExist) throw new NotFoundError('Admin not found.');
+		const identity = await strategy.findByEmail(email);
+		if (!identity) {
+			throw new NotFoundError("User not found.");
+		}
 
-		const hashPassword = await hashedPassword(rawPassword);
+		const hashed = await hashedPassword(newPassword);
 
-		await this.adminRepository.update(checkAdminExist._id.toString(), {
-			password: hashPassword,
-		});
+		await strategy.updatePassword(identity._id.toString(), hashed);
 	}
 }
