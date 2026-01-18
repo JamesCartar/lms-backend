@@ -15,7 +15,7 @@ import {
 	UnauthorizedError,
 } from '../utils/errors.util';
 import { OtpRepository } from '../repositories/otp.repository';
-import { generateOtp } from '../utils/otp.util';
+import { generateOtp, sendOtpEmail } from '../utils/otp.util';
 import { OtpTargetType } from '../db/models/otp.model';
 import { hashedPassword } from '../utils/password.util';
 
@@ -109,7 +109,7 @@ export class AuthService {
 				type: 'admin',
 			} satisfies JwtPayload,
 			env.JWT_SECRET,
-			{ expiresIn: '24h' }
+			{ expiresIn: '24h' },
 		);
 
 		this.logLogin({
@@ -143,7 +143,7 @@ export class AuthService {
 
 		const isPasswordValid = await bcrypt.compare(
 			password,
-			student.password
+			student.password,
 		);
 		if (!isPasswordValid) {
 			throw new UnauthorizedError('Invalid email or password');
@@ -158,7 +158,7 @@ export class AuthService {
 				type: 'student',
 			} satisfies JwtPayload,
 			env.JWT_SECRET,
-			{ expiresIn: '24h' }
+			{ expiresIn: '24h' },
 		);
 
 		this.logLogin({
@@ -183,7 +183,7 @@ export class AuthService {
 	async getCurrentUser(jwtPayload: JwtPayload) {
 		if (jwtPayload.type === 'admin') {
 			const admin = await this.adminRepository.findByIdWithPermissions(
-				jwtPayload.id
+				jwtPayload.id,
 			);
 
 			if (!admin) {
@@ -194,7 +194,7 @@ export class AuthService {
 		}
 
 		const student = await this.studentRepository.findByIdWithoutPassword(
-			jwtPayload.id
+			jwtPayload.id,
 		);
 
 		if (!student) {
@@ -221,6 +221,8 @@ export class AuthService {
 			email,
 			type: OtpTargetType.ADMIN,
 		});
+
+		await sendOtpEmail(email, generatedOtp);
 
 		return generatedOtp;
 	}
