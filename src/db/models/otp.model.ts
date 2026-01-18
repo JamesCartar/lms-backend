@@ -1,12 +1,12 @@
-import { getModelForClass, index, prop } from '@typegoose/typegoose';
+import { getModelForClass, index, prop } from "@typegoose/typegoose";
 
 /**
  * OTP target type
  * * Determines which user domain this OTP belongs to
  */
 export enum OtpTargetType {
-	ADMIN = 'admin',
-	STUDENT = 'student',
+	ADMIN = "admin",
+	STUDENT = "student",
 }
 
 /**
