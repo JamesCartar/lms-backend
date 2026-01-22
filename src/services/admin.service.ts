@@ -1,14 +1,17 @@
-import type { Ref } from '@typegoose/typegoose';
+import type { Ref } from "@typegoose/typegoose";
+import bcrypt from "bcryptjs";
+import { env } from "../config/env";
+
 import type {
 	AdminCreateInput,
 	AdminUpdateInput,
-} from '../db/models/admin.model';
-import type { Role } from '../db/models/role.model';
-import { AdminRepository } from '../repositories/admin.repository';
-import { RoleRepository } from '../repositories/role.repository';
-import { ConflictError, NotFoundError } from '../utils/errors.util';
-import type { MongoFilter } from '../utils/filter.util';
-import { calculateSkip } from '../utils/pagination.util';
+} from "../db/models/admin.model";
+import type { Role } from "../db/models/role.model";
+import { AdminRepository } from "../repositories/admin.repository";
+import { RoleRepository } from "../repositories/role.repository";
+import { ConflictError, NotFoundError } from "../utils/errors.util";
+import type { MongoFilter } from "../utils/filter.util";
+import { calculateSkip } from "../utils/pagination.util";
 
 /**
  * Admin Service - Business logic layer for Admin
@@ -26,14 +29,14 @@ export class AdminService {
 		// AdminCreateSchema validation ensures required fields are present
 		const existing = await this.repository.findByEmail(data.email);
 		if (existing) {
-			throw new ConflictError('Admin with this email already exists');
+			throw new ConflictError("Admin with this email already exists");
 		}
 
 		// Validate role if provided
 		if (data.role) {
 			const role = await this.roleRepository.findById(data.role);
 			if (!role) {
-				throw new NotFoundError('Role not found');
+				throw new NotFoundError("Role not found");
 			}
 		}
 
@@ -41,7 +44,7 @@ export class AdminService {
 		return await this.repository.create({
 			name: data.name,
 			email: data.email,
-			password: data.password,
+			password: await bcrypt.hash(data.password, env.SALT_ROUNDS),
 			// Zod validates as string (ObjectId), which is valid for Mongoose references
 			role: data.role as Ref<Role> | undefined,
 			isActive: data.isActive,
@@ -51,7 +54,7 @@ export class AdminService {
 	async getAdminById(id: string) {
 		const admin = await this.repository.findById(id);
 		if (!admin) {
-			throw new NotFoundError('Admin not found');
+			throw new NotFoundError("Admin not found");
 		}
 		return admin;
 	}
@@ -60,8 +63,8 @@ export class AdminService {
 		page: number = 1,
 		limit: number = 10,
 		sortBy?: string,
-		sortOrder?: 'asc' | 'desc',
-		filter: MongoFilter = {}
+		sortOrder?: "asc" | "desc",
+		filter: MongoFilter = {},
 	) {
 		const skip = calculateSkip(page, limit);
 		const admins = await this.repository.findAll(
@@ -69,17 +72,18 @@ export class AdminService {
 			limit,
 			sortBy,
 			sortOrder,
-			filter
+			filter,
 		);
 		const total = await this.repository.count(filter);
 		return { admins, total };
 	}
 
 	async updateAdmin(id: string, data: AdminUpdateInput) {
+		let hashedPassword: string | undefined;
 		if (data.email) {
 			const existing = await this.repository.findByEmail(data.email);
 			if (existing && existing._id.toString() !== id) {
-				throw new ConflictError('Admin with this email already exists');
+				throw new ConflictError("Admin with this email already exists");
 			}
 		}
 
@@ -87,21 +91,24 @@ export class AdminService {
 		if (data.role) {
 			const role = await this.roleRepository.findById(data.role);
 			if (!role) {
-				throw new NotFoundError('Role not found');
+				throw new NotFoundError("Role not found");
 			}
+		}
+
+		if (data.password) {
+			hashedPassword = await bcrypt.hash(data.password, env.SALT_ROUNDS);
 		}
 
 		// In production, password should be hashed here if provided
 		const admin = await this.repository.update(id, {
 			name: data.name,
 			email: data.email,
-			password: data.password,
-			// Zod validates as string (ObjectId), which is valid for Mongoose references
+			password: hashedPassword,
 			role: data.role as Ref<Role> | undefined,
 			isActive: data.isActive,
 		});
 		if (!admin) {
-			throw new NotFoundError('Admin not found');
+			throw new NotFoundError("Admin not found");
 		}
 		return admin;
 	}
@@ -109,7 +116,7 @@ export class AdminService {
 	async deleteAdmin(id: string) {
 		const admin = await this.repository.delete(id);
 		if (!admin) {
-			throw new NotFoundError('Admin not found');
+			throw new NotFoundError("Admin not found");
 		}
 		return admin;
 	}

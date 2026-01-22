@@ -1,7 +1,8 @@
-import "dotenv/config";
 import type { DocumentType } from "@typegoose/typegoose";
 import bcrypt from "bcryptjs";
+import "dotenv/config";
 import { connectDatabase } from "../../config/database";
+import { env } from "../../config/env";
 import { AdminModel } from "../models/admin.model";
 import { type Permission, PermissionModel } from "../models/permission.model";
 import { type Role, RoleModel } from "../models/role.model";
@@ -15,7 +16,7 @@ import { studentSeeds } from "./student.seed";
  * Populates the database with initial data
  */
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = env.SALT_ROUNDS;
 
 const seedPermissions = async () => {
 	console.log("Seeding permissions...");
