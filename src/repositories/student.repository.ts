@@ -10,8 +10,8 @@ export class StudentRepository {
 		return await StudentModel.create(data);
 	}
 
-	async findById(id: string): Promise<DocumentType<Student> | null> {
-		return await StudentModel.findById(id);
+	async findById(id: string): Promise<Student | null> {
+		return await StudentModel.findById(id).lean();
 	}
 
 	async findByIdWithoutPassword(

@@ -1,3 +1,5 @@
+import bcrypt from "bcryptjs";
+import { env } from "../config/env";
 import type {
 	StudentCreateInput,
 	StudentUpdateInput,
@@ -25,15 +27,25 @@ export class StudentService {
 		}
 
 		// In production, password should be hashed here
-		return await this.repository.create(data);
+
+		const hashedPassword = await bcrypt.hash(data.password, env.SALT_ROUNDS);
+
+		return await this.repository.create({
+			...data,
+			password: hashedPassword,
+		});
 	}
 
 	async getStudentById(id: string) {
 		const student = await this.repository.findById(id);
+
 		if (!student) {
 			throw new NotFoundError("Student not found");
 		}
-		return student;
+
+		const { password: _, ...studentWithoutPassword } = student;
+
+		return studentWithoutPassword;
 	}
 
 	async getAllStudents(
@@ -65,6 +77,11 @@ export class StudentService {
 			if (existing && existing._id.toString() !== id) {
 				throw new ConflictError("Student with this email already exists");
 			}
+		}
+
+		if (data.password) {
+			const hashedPassword = await bcrypt.hash(data.password, env.SALT_ROUNDS);
+			data.password = hashedPassword;
 		}
 
 		// In production, password should be hashed here if provided
