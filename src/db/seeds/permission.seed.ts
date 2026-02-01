@@ -106,4 +106,30 @@ export const permissionSeeds = [
 		action: "delete",
 		description: "Delete permissions",
 	},
+
+	// Course CRUD Permissions
+	{
+		name: "course.create",
+		resource: "course",
+		action: "create",
+		description: "Create new courses",
+	},
+	{
+		name: "course.read",
+		resource: "course",
+		action: "read",
+		description: "View courses",
+	},
+	{
+		name: "course.update",
+		resource: "course",
+		action: "update",
+		description: "Update courses",
+	},
+	{
+		name: "course.delete",
+		resource: "course",
+		action: "delete",
+		description: "Delete courses",
+	},
 ];

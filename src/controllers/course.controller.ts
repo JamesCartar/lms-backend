@@ -3,7 +3,6 @@ import { env } from "../config/env";
 import { buildCourseFilter } from "../filters/course.filter";
 import { asyncHandler } from "../middleware/error.middleware";
 import { CourseService } from "../services/course.service";
-import { buildFileLocations } from "../utils/image.util";
 import {
 	calculatePaginationMeta,
 	getPaginationParams,
@@ -26,12 +25,16 @@ export class CourseController {
 	 */
 	private getFileLocations() {
 		return {
-			fileLocation: buildFileLocations(env.BASE_URL, ["courseImage"]),
+			fileLocation: {
+				courseImage: `${env.BASE_URL}/uploads/courses/`,
+			},
 		};
 	}
 
 	create = asyncHandler(async (req: Request, res: Response) => {
-		const course = await this.service.createCourse(req.body);
+		// Get uploaded file filename if present
+		const imageFilename = req.file?.filename;
+		const course = await this.service.createCourse(req.body, imageFilename);
 		sendSuccessResponse(res, {
 			data: {
 				...course.toObject(),
@@ -82,7 +85,9 @@ export class CourseController {
 	});
 
 	update = asyncHandler(async (req: Request, res: Response) => {
-		const course = await this.service.updateCourse(getIdParam(req), req.body);
+		// Get uploaded file filename if present
+		const imageFilename = req.file?.filename;
+		const course = await this.service.updateCourse(getIdParam(req), req.body, imageFilename);
 		sendSuccessResponse(res, {
 			data: {
 				...course.toObject(),

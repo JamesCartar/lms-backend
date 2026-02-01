@@ -5,16 +5,11 @@ import type {
 	CourseLevel,
 	CourseUpdateInput,
 } from "../db/models/course.model";
+import { deleteUploadedFile } from "../middleware/upload.middleware";
 import { AdminRepository } from "../repositories/admin.repository";
 import { CourseRepository } from "../repositories/course.repository";
 import { ConflictError, NotFoundError } from "../utils/errors.util";
 import type { MongoFilter } from "../utils/filter.util";
-import {
-	deleteImage,
-	isBase64Image,
-	saveBase64Image,
-	updateImage,
-} from "../utils/image.util";
 import { calculateSkip } from "../utils/pagination.util";
 
 // Subdirectory for course images
@@ -43,10 +38,14 @@ export class CourseService {
 		this.adminRepository = new AdminRepository();
 	}
 
-	async createCourse(data: CourseCreateInput) {
+	async createCourse(data: CourseCreateInput, imageFilename?: string) {
 		// Check for duplicate title
 		const existing = await this.repository.findByTitle(data.title);
 		if (existing) {
+			// Delete uploaded file if course creation fails
+			if (imageFilename) {
+				deleteUploadedFile(imageFilename, COURSE_IMAGES_DIR);
+			}
 			throw new ConflictError("Course with this title already exists");
 		}
 
@@ -54,21 +53,19 @@ export class CourseService {
 		if (data.admin) {
 			const admin = await this.adminRepository.findById(data.admin);
 			if (!admin) {
+				// Delete uploaded file if admin validation fails
+				if (imageFilename) {
+					deleteUploadedFile(imageFilename, COURSE_IMAGES_DIR);
+				}
 				throw new NotFoundError("Admin not found");
 			}
-		}
-
-		// Handle image upload if provided as base64
-		let imagePath = data.image || "";
-		if (data.image && isBase64Image(data.image)) {
-			imagePath = saveBase64Image(data.image, COURSE_IMAGES_DIR);
 		}
 
 		return await this.repository.create({
 			title: data.title,
 			overview: data.overview,
 			resources: data.resources,
-			image: imagePath,
+			image: imageFilename || "",
 			categories: data.categories,
 			rating: data.rating,
 			minute: data.minute,
@@ -106,10 +103,14 @@ export class CourseService {
 		return { courses, total };
 	}
 
-	async updateCourse(id: string, data: CourseUpdateInput) {
+	async updateCourse(id: string, data: CourseUpdateInput, imageFilename?: string) {
 		// Check if course exists
 		const existingCourse = await this.repository.findById(id);
 		if (!existingCourse) {
+			// Delete uploaded file if course not found
+			if (imageFilename) {
+				deleteUploadedFile(imageFilename, COURSE_IMAGES_DIR);
+			}
 			throw new NotFoundError("Course not found");
 		}
 
@@ -117,6 +118,10 @@ export class CourseService {
 		if (data.title && data.title !== existingCourse.title) {
 			const duplicateTitle = await this.repository.findByTitle(data.title);
 			if (duplicateTitle) {
+				// Delete uploaded file if duplicate title found
+				if (imageFilename) {
+					deleteUploadedFile(imageFilename, COURSE_IMAGES_DIR);
+				}
 				throw new ConflictError("Course with this title already exists");
 			}
 		}
@@ -125,26 +130,29 @@ export class CourseService {
 		if (data.admin) {
 			const admin = await this.adminRepository.findById(data.admin);
 			if (!admin) {
+				// Delete uploaded file if admin validation fails
+				if (imageFilename) {
+					deleteUploadedFile(imageFilename, COURSE_IMAGES_DIR);
+				}
 				throw new NotFoundError("Admin not found");
 			}
 		}
 
-		// Handle image update if new image is provided as base64
-		let imagePath = data.image;
-		if (data.image && isBase64Image(data.image)) {
-			// Delete old image and save new one
-			imagePath = updateImage(
-				existingCourse.image,
-				data.image,
-				COURSE_IMAGES_DIR,
-			);
+		// Handle image update: if new image is uploaded, delete old one
+		let finalImagePath = existingCourse.image;
+		if (imageFilename) {
+			// Delete old image if it exists
+			if (existingCourse.image) {
+				deleteUploadedFile(existingCourse.image, COURSE_IMAGES_DIR);
+			}
+			finalImagePath = imageFilename;
 		}
 
 		const course = await this.repository.update(id, {
 			title: data.title,
 			overview: data.overview,
 			resources: data.resources,
-			image: imagePath,
+			image: finalImagePath,
 			categories: data.categories,
 			rating: data.rating,
 			minute: data.minute,
@@ -168,7 +176,7 @@ export class CourseService {
 
 		// Delete associated image if it exists
 		if (course.image) {
-			deleteImage(course.image, COURSE_IMAGES_DIR);
+			deleteUploadedFile(course.image, COURSE_IMAGES_DIR);
 		}
 
 		const deletedCourse = await this.repository.delete(id);

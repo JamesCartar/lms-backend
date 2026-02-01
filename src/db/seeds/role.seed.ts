@@ -25,6 +25,10 @@ export const roleSeeds = [
 			"permission.read",
 			"permission.update",
 			"permission.delete",
+			"course.create",
+			"course.read",
+			"course.update",
+			"course.delete",
 		],
 	},
 	{
@@ -39,6 +43,10 @@ export const roleSeeds = [
 			"student.update",
 			"student.delete",
 			"permission.read",
+			"course.create",
+			"course.read",
+			"course.update",
+			"course.delete",
 		],
 	},
 	{
@@ -51,12 +59,13 @@ export const roleSeeds = [
 			"student.update",
 			"role.read",
 			"permission.read",
+			"course.read",
 		],
 	},
 	{
 		name: "Viewer",
 		description: "Read-only access to system data",
 		type: "system",
-		permissions: ["admin.read", "role.read", "student.read", "permission.read"],
+		permissions: ["admin.read", "role.read", "student.read", "permission.read", "course.read"],
 	},
 ];
