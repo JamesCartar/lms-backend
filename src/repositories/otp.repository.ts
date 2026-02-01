@@ -16,6 +16,14 @@ export class OtpRepository {
 		});
 	}
 
+	async findByVerifiedEmail(email: string, source: OtpTargetType) {
+		return await OtpModel.findOne({
+			email,
+			verified: true,
+			type: source,
+		});
+	}
+
 	// * verified မဖြစ်သေးတဲ့ ဟာကို ရှာ ပီး verified လုပ်
 	async update({
 		email,

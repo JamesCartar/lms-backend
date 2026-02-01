@@ -83,14 +83,14 @@ export class AuthController {
 		async (req: Request, res: Response) => {
 			const { email, otp, source } = req.body;
 
-			await this.authService.verifyForgotPasswordOtp({
+			const resetToken = await this.authService.verifyForgotPasswordOtp({
 				email,
 				otp,
 				source,
 			});
 
 			sendSuccessResponse(res, {
-				data: null,
+				data: { resetToken },
 				message: "Otp verified successfully.",
 				statusCode: 200,
 			});
@@ -98,9 +98,12 @@ export class AuthController {
 	);
 
 	resetPasswordWithOtp = asyncHandler(async (req: Request, res: Response) => {
-		const { email, newPassword, source } = req.body;
+		const { newPassword, resetToken } = req.body;
 
-		await this.authService.resetPasswordWithOtp({ email, newPassword, source });
+		console.log({ resetToken, });
+
+
+		await this.authService.resetPasswordWithOtp({ resetToken, newPassword });
 
 		sendSuccessResponse(res, {
 			data: null,

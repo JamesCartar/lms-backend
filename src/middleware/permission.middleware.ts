@@ -2,21 +2,25 @@ import type { NextFunction, Request, Response } from "express";
 import { ForbiddenError, UnauthorizedError } from "../utils/errors.util";
 
 /**
+ * Helper: ensure JWT exists and is an ACCESS token
+ */
+function requireAccessJwt(req: Request) {
+	if (!req.jwt || req.jwt.purpose !== "access") {
+		throw new UnauthorizedError("Authentication required");
+	}
+	return req.jwt; // now typed as access payload (has id/email/permissions/role/etc.)
+}
+
+/**
  * Permission Check Middleware
  * Verifies that the authenticated user has the required permissions
  */
 export const checkPermission = (...requiredPermissions: string[]) => {
 	return (req: Request, _res: Response, next: NextFunction): void => {
 		try {
-			// Check if user is authenticated
-			if (!req.jwt) {
-				throw new UnauthorizedError("Authentication required");
-			}
+			const jwt = requireAccessJwt(req);
 
-			// Get user permissions from JWT
-			const userPermissions = req.jwt.permissions || [];
-
-			// Check if user has at least one of the required permissions
+			const userPermissions = jwt.permissions || [];
 			const hasPermission = requiredPermissions.some((permission) =>
 				userPermissions.includes(permission),
 			);
@@ -40,12 +44,9 @@ export const checkPermission = (...requiredPermissions: string[]) => {
 export const checkAllPermissions = (...requiredPermissions: string[]) => {
 	return (req: Request, _res: Response, next: NextFunction): void => {
 		try {
-			if (!req.jwt) {
-				throw new UnauthorizedError("Authentication required");
-			}
+			const jwt = requireAccessJwt(req);
 
-			const userPermissions = req.jwt.permissions || [];
-
+			const userPermissions = jwt.permissions || [];
 			const hasAllPermissions = requiredPermissions.every((permission) =>
 				userPermissions.includes(permission),
 			);
@@ -69,12 +70,9 @@ export const checkAllPermissions = (...requiredPermissions: string[]) => {
 export const checkRole = (...allowedRoles: string[]) => {
 	return (req: Request, _res: Response, next: NextFunction): void => {
 		try {
-			if (!req.jwt) {
-				throw new UnauthorizedError("Authentication required");
-			}
+			const jwt = requireAccessJwt(req);
 
-			const userRole = req.jwt.role;
-
+			const userRole = jwt.role;
 			if (!userRole || !allowedRoles.includes(userRole)) {
 				throw new ForbiddenError(
 					`Access denied. Required roles: ${allowedRoles.join(" or ")}`,
@@ -91,17 +89,11 @@ export const checkRole = (...allowedRoles: string[]) => {
 /**
  * Check if user is admin type
  */
-export const isAdmin = (
-	req: Request,
-	_res: Response,
-	next: NextFunction,
-): void => {
+export const isAdmin = (req: Request, _res: Response, next: NextFunction): void => {
 	try {
-		if (!req.jwt) {
-			throw new UnauthorizedError("Authentication required");
-		}
+		const jwt = requireAccessJwt(req);
 
-		if (req.jwt.type !== "admin") {
+		if (jwt.type !== "admin") {
 			throw new ForbiddenError("Access denied. Admin access required.");
 		}
 
@@ -114,17 +106,11 @@ export const isAdmin = (
 /**
  * Check if user is student type
  */
-export const isStudent = (
-	req: Request,
-	_res: Response,
-	next: NextFunction,
-): void => {
+export const isStudent = (req: Request, _res: Response, next: NextFunction): void => {
 	try {
-		if (!req.jwt) {
-			throw new UnauthorizedError("Authentication required");
-		}
+		const jwt = requireAccessJwt(req);
 
-		if (req.jwt.type !== "student") {
+		if (jwt.type !== "student") {
 			throw new ForbiddenError("Access denied. Student access required.");
 		}
 

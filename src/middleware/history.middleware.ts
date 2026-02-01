@@ -22,8 +22,12 @@ export const saveHistory = (resource: string) => {
 
 		// Override send function to capture response
 		res.json = function (data: ResponseData) {
-			// Only log if the request was successful (2xx status code)
-			if (res.statusCode >= 200 && res.statusCode < 300 && req.jwt) {
+			// ✅ Only log if the request was successful (2xx) AND token is an ACCESS token
+			if (
+				res.statusCode >= 200 &&
+				res.statusCode < 300 &&
+				req.jwt?.purpose === "access"
+			) {
 				const auditLogService = new AuditLogService();
 
 				// Determine action based on HTTP method
@@ -45,7 +49,7 @@ export const saveHistory = (resource: string) => {
 				// Create audit log asynchronously (don't block response)
 				auditLogService
 					.createAuditLog({
-						userId: req.jwt.id,
+						userId: req.jwt.id, // ✅ safe because purpose === "access"
 						userType: req.jwt.type,
 						email: req.jwt.email,
 						action,

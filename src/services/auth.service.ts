@@ -1,10 +1,9 @@
-import { DocumentType } from "@typegoose/typegoose";
+import type { DocumentType } from "@typegoose/typegoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { env } from "../config/env";
-import { Admin } from "../db/models/admin.model";
+import type { Admin } from "../db/models/admin.model";
 import { OtpTargetType } from "../db/models/otp.model";
-import { Student } from "../db/models/student.model";
+import type { Student } from "../db/models/student.model";
 import { AdminRepository } from "../repositories/admin.repository";
 import { OtpRepository } from "../repositories/otp.repository";
 import { StudentRepository } from "../repositories/student.repository";
@@ -18,6 +17,7 @@ import {
 	NotFoundError,
 	UnauthorizedError,
 } from "../utils/errors.util";
+import { signJwt, verifyJwt } from "../utils/jwt.util";
 import { generateOtp, sendOtpEmail } from "../utils/otp.util";
 import { hashedPassword } from "../utils/password.util";
 import { UserLogService } from "./userlog.service";
@@ -98,24 +98,24 @@ export class AuthService {
 			) => Promise<DocumentType<Admin> | DocumentType<Student> | null>;
 		}
 	> = {
-		[OtpTargetType.ADMIN]: {
-			findByEmail: (email) => this.adminRepository.findByEmail(email),
+			[OtpTargetType.ADMIN]: {
+				findByEmail: (email) => this.adminRepository.findByEmail(email),
 
-			updatePassword: (id, hashedPassword) =>
-				this.adminRepository.update(id, {
-					password: hashedPassword,
-				}),
-		},
+				updatePassword: (id, hashedPassword) =>
+					this.adminRepository.update(id, {
+						password: hashedPassword,
+					}),
+			},
 
-		[OtpTargetType.STUDENT]: {
-			findByEmail: (email) => this.studentRepository.findByEmail(email),
+			[OtpTargetType.STUDENT]: {
+				findByEmail: (email) => this.studentRepository.findByEmail(email),
 
-			updatePassword: (id, hashedPassword) =>
-				this.studentRepository.update(id, {
-					password: hashedPassword,
-				}),
-		},
-	};
+				updatePassword: (id, hashedPassword) =>
+					this.studentRepository.update(id, {
+						password: hashedPassword,
+					}),
+			},
+		};
 
 	async loginAdmin(email: string, password: string, context: LoginContext) {
 		const admin = await this.adminRepository.findByEmailWithPermissions(email);
@@ -133,15 +133,15 @@ export class AuthService {
 		}
 
 		const { roleName, permissions } = this.extractRoleData(admin.role);
-		const token = jwt.sign(
+		const token = signJwt(
 			{
 				id: admin._id.toString(),
 				email: admin.email,
 				role: roleName,
 				permissions,
 				type: "admin",
-			} satisfies JwtPayload,
-			env.JWT_SECRET,
+				purpose: "access",
+			},
 			{ expiresIn: "24h" },
 		);
 
@@ -179,15 +179,16 @@ export class AuthService {
 			throw new UnauthorizedError("Invalid email or password");
 		}
 
-		const token = jwt.sign(
+
+		const token = signJwt(
 			{
 				id: student._id.toString(),
 				email: student.email,
 				role: undefined,
 				permissions: [],
 				type: "student",
-			} satisfies JwtPayload,
-			env.JWT_SECRET,
+				purpose: "access",
+			},
 			{ expiresIn: "24h" },
 		);
 
@@ -211,26 +212,19 @@ export class AuthService {
 	}
 
 	async getCurrentUser(jwtPayload: JwtPayload) {
+
+		if (jwtPayload.purpose !== "access") {
+			throw new UnauthorizedError("Invalid token");
+		}
+
 		if (jwtPayload.type === "admin") {
-			const admin = await this.adminRepository.findByIdWithPermissions(
-				jwtPayload.id,
-			);
-
-			if (!admin) {
-				throw new UnauthorizedError("User not found");
-			}
-
+			const admin = await this.adminRepository.findByIdWithPermissions(jwtPayload.id);
+			if (!admin) throw new UnauthorizedError("User not found");
 			return admin;
 		}
 
-		const student = await this.studentRepository.findByIdWithoutPassword(
-			jwtPayload.id,
-		);
-
-		if (!student) {
-			throw new UnauthorizedError("User not found");
-		}
-
+		const student = await this.studentRepository.findByIdWithoutPassword(jwtPayload.id);
+		if (!student) throw new UnauthorizedError("User not found");
 		return student;
 	}
 
@@ -295,20 +289,52 @@ export class AuthService {
 			},
 		});
 
+
 		if (!result) throw new NotFoundError("OTP not found.");
 
-		return result;
+		const resetToken = signJwt({
+			purpose: "password_reset",
+			email,
+			type: source,
+		}, {
+			expiresIn: "5m"
+		})
+
+		return resetToken;
 	}
 
 	async resetPasswordWithOtp({
-		email,
+		resetToken,
 		newPassword,
-		source,
+
 	}: {
-		email: string;
+		resetToken: string;
 		newPassword: string;
-		source: OtpTargetType;
 	}) {
+		let payload: JwtPayload;
+
+		try {
+			payload = verifyJwt(resetToken); // your util uses jwt.verify internally
+		} catch (err) {
+			if (err instanceof jwt.TokenExpiredError) {
+				throw new UnauthorizedError("Reset token expired. Please request a new OTP.");
+			}
+			throw new UnauthorizedError("Invalid reset token.");
+		}
+
+		if (payload.purpose !== "password_reset") {
+			throw new UnauthorizedError("Invalid reset token.");
+		}
+
+		const email = payload.email.toLowerCase();
+
+		const source = payload.type as OtpTargetType;
+
+		const otpDoc = await this.otpRepository.findByVerifiedEmail(email, source);
+		if (!otpDoc) throw new NotFoundError("OTP not found.");
+		if (!otpDoc.verified) throw new BadRequestError("OTP not verified.");
+
+
 		const strategy = this.passwordResetStrategy[source];
 
 		const identity = await strategy.findByEmail(email);

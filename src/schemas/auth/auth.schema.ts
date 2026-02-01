@@ -18,7 +18,6 @@ export const VerifyForgotPasswordOtpSchema = z.object({
 });
 
 export const ResetPasswordSchema = z.object({
-	email: createEmailSchema(true),
+	resetToken: createStringSchema(true, 20, 600),
 	newPassword: createStringSchema(true, 6, 100),
-	source: createEnumSchema(OtpTargetType),
 });
