@@ -4,54 +4,75 @@ import * as nodemailer from 'nodemailer';
 import * as pug from 'pug';
 import { env } from '../config/env';
 
-const SMTP_HOST = env.SMTP_HOST;
-const SMTP_PORT = env.SMTP_PORT;
-const SMTP_EMAIL_AUTH_USER = env.SMTP_EMAIL_AUTH_USER;
-const SMTP_EMAIL_PASSWORD = env.SMTP_EMAIL_PASSWORD;
-const SMTP_FROM = env.SMTP_FROM;
-
 /**
  * Generate a numeric OTP
- * * Uses crypto-safe randomness
- * * Returns string to preserve leading zeros
  */
-
 export const generateOtp = (length: number = 6): string => {
 	const max = 10 ** length;
-
-	const otp = crypto.randomInt(0, max).toString().padStart(length, '0');
-
-	return otp;
+	return crypto.randomInt(0, max).toString().padStart(length, "0");
 };
 
 export const sendOtpEmail = async (email: string, otp: string) => {
-	const templatePath = path.join(
-		__dirname,
-		'..',
-		'..',
-		'templates',
-		'otp-email.pug',
-	);
+	try {
+		// ✅ Use cwd so it works in production builds
+		const templatePath = path.join(
+			process.cwd(),
+			"templates",
+			"otp-email.pug",
+		);
 
-	console.log({ templatePath });
+		const compiledFunction = pug.compileFile(templatePath);
+		const html = compiledFunction({ otp });
 
-	const compiledFunction = pug.compileFile(templatePath);
-	const html = compiledFunction({ otp });
+		const port = Number(env.SMTP_PORT);
 
-	const transporter = nodemailer.createTransport({
-		host: SMTP_HOST,
-		port: Number(SMTP_PORT),
-		secure: true,
-		auth: {
-			user: SMTP_EMAIL_AUTH_USER,
-			pass: SMTP_EMAIL_PASSWORD,
-		},
-	});
+		const transporter = nodemailer.createTransport({
+			host: env.SMTP_HOST,
+			port,
+			secure: port === 465, // correct behavior
+			auth: {
+				user: env.SMTP_EMAIL_AUTH_USER,
+				pass: env.SMTP_EMAIL_PASSWORD,
+			},
+		});
 
-	transporter.sendMail({
-		from: SMTP_FROM,
-		to: email,
-		subject: 'Your One-Time Verification Code',
-		html,
-	});
+		// ✅ Optional but VERY useful: verify SMTP connection
+		await transporter.verify();
+
+		// ✅ Await sendMail so errors are caught
+		const info = await transporter.sendMail({
+			from: `"${env.SMTP_FROM}" <${env.SMTP_EMAIL_AUTH_USER}>`,
+			to: email,
+			subject: "Your One-Time Verification Code",
+			html,
+		});
+
+		console.log({ info });
+
+		// Nodemailer returns accepted/rejected info
+		if (info.accepted && info.accepted.length > 0) {
+			return {
+				success: true,
+				messageId: info.messageId,
+				accepted: info.accepted,
+			};
+		}
+
+		// Rare, but possible
+		return {
+			success: false,
+			error: "Email was not accepted by the SMTP server",
+			rejected: info.rejected,
+		};
+	} catch (error) {
+		console.error("Failed to send OTP email:", error);
+
+		return {
+			success: false,
+			error:
+				error instanceof Error
+					? error.message
+					: "Unknown email sending error",
+		};
+	}
 };

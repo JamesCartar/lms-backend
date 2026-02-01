@@ -259,7 +259,11 @@ export class AuthService {
 			type: source,
 		});
 
-		await sendOtpEmail(email, generatedOtp);
+		const result = await sendOtpEmail(email, generatedOtp);
+
+		if (!result.success) {
+			throw new Error("Failed to send OTP email. Please try again.");
+		}
 
 		return generatedOtp;
 	}
