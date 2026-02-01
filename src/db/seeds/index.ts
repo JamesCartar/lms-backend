@@ -6,6 +6,7 @@ import { AdminModel } from "../models/admin.model";
 import { type Permission, PermissionModel } from "../models/permission.model";
 import { type Role, RoleModel } from "../models/role.model";
 import { StudentModel } from "../models/student.model";
+import { seedCourses } from "./course.seed";
 import { permissionSeeds } from "./permission.seed";
 import { roleSeeds } from "./role.seed";
 import { studentSeeds } from "./student.seed";
@@ -120,6 +121,7 @@ const seed = async () => {
 		const roles = await seedRoles(permissions);
 		await seedStudents();
 		await seedAdmin(roles);
+		await seedCourses();
 
 		console.log("\n✅ Database seeding completed successfully!");
 		console.log("\nDefault credentials:");

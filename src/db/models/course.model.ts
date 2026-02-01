@@ -53,7 +53,7 @@ export class Course {
 	@prop({ ref: () => Admin, type: () => String })
 	public admin?: Ref<Admin>;
 
-	@prop({ enum: CourseLevel, default: null })
+	@prop({ type: String, enum: Object.values(CourseLevel), default: null })
 	public level?: CourseLevel | null;
 
 	@prop({ default: true })
