@@ -28,6 +28,7 @@
 		"express": "^5.2.1",
 		"jsonwebtoken": "^9.0.3",
 		"mongoose": "^8.9.5",
+		"multer": "^2.0.2",
 		"nodemailer": "^7.0.12",
 		"pug": "^3.0.3",
 		"zod": "^4.1.13"
@@ -38,6 +39,7 @@
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.6",
 		"@types/jsonwebtoken": "^9.0.10",
+		"@types/multer": "^2.0.0",
 		"@types/node": "^25.0.2",
 		"dotenv": "^17.2.3",
 		"dotenv-expand": "^12.0.3",

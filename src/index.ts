@@ -4,6 +4,7 @@ import express, {
 	type Request,
 	type Response,
 } from "express";
+import * as path from "node:path";
 import { connectDatabase } from "./config/database";
 import { env } from "./config/env";
 import { errorHandler } from "./middleware/error.middleware";
@@ -17,14 +18,17 @@ const app: Application = express();
 const PORT = env.PORT;
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 app.use(
 	cors({
 		origin: "*",
 	}),
 );
+
+// Serve static files from uploads directory
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Health check route
 app.get("/health", (_req: Request, res: Response) => {
