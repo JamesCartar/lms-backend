@@ -17,7 +17,7 @@ import {
 export const CourseFilterQuerySchema = BaseFilterQuerySchema.extend({
 	title: z.string().min(1).max(200).optional(),
 	categories: z.string().min(1).max(100).optional(), // Comma-separated categories
-	level: z.enum(["beginner", "intermediate", "advance"]).optional(),
+	level: z.enum(["beginner", "intermediate", "advanced"]).optional(),
 	minPrice: z
 		.string()
 		.regex(/^\d+(\.\d+)?$/)

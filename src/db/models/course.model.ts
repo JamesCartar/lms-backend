@@ -15,7 +15,7 @@ import { Admin } from "./admin.model";
 export enum CourseLevel {
 	BEGINNER = "beginner",
 	INTERMEDIATE = "intermediate",
-	ADVANCE = "advance",
+	ADVANCED = "advanced",
 }
 
 /**
@@ -80,7 +80,7 @@ export const CourseCreateSchema = z.object({
 	minute: createNumberSchema(false, 0),
 	price: createNumberSchema(false, 0),
 	admin: createObjectIdSchema(false),
-	level: z.enum(["beginner", "intermediate", "advance"]).nullable().optional(),
+	level: z.enum(["beginner", "intermediate", "advanced"]).nullable().optional(),
 	isActive: createBooleanSchema(false),
 });
 

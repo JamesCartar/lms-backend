@@ -168,7 +168,7 @@ export class CourseService {
 
 		// Delete associated image if it exists
 		if (course.image) {
-			deleteImage(course.image);
+			deleteImage(course.image, COURSE_IMAGES_DIR);
 		}
 
 		const deletedCourse = await this.repository.delete(id);
