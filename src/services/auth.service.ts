@@ -261,9 +261,10 @@ export class AuthService {
 
 		const result = await sendOtpEmail(email, generatedOtp);
 
-		if (!result.success) {
-			throw new Error("Failed to send OTP email. Please try again.");
-		}
+		console.log({ result });
+		// if (!result.success) {
+		// 	throw new Error("Failed to send OTP email. Please try again.");
+		// }
 
 		return generatedOtp;
 	}
