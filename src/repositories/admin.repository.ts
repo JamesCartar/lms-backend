@@ -15,7 +15,7 @@ const rolePermissionsPopulate = {
  * Admin Repository - Data access layer for Admin
  */
 export class AdminRepository {
-	async create(data: Partial<Admin>): Promise<DocumentType<Admin>> {
+	async create(data: Partial<Admin>) {
 		return await AdminModel.create(data);
 	}
 
@@ -55,7 +55,7 @@ export class AdminRepository {
 		sortBy: string = "createdAt",
 		sortOrder: "asc" | "desc" = "desc",
 		filter: MongoFilter = {},
-	): Promise<DocumentType<Admin>[]> {
+	) {
 		const sortObj: Record<string, 1 | -1> = {
 			[sortBy]: sortOrder === "asc" ? 1 : -1,
 		};
