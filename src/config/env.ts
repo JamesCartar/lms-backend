@@ -6,6 +6,7 @@ expand(config());
 
 const EnvSchema = z.object({
 	PORT: z.coerce.number().int().positive().default(3000),
+	BASE_URL: z.string().min(1).default('http://localhost:3000'),
 	MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
 	JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
 	TRUSTED_ORIGINS: z.preprocess(
